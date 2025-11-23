@@ -44,6 +44,16 @@ export type LandingStats = {
   subtext: string;
 };
 
+type VideoRoom = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  status: string | null;
+  is_private: boolean | null;
+  created_at: string | null;
+};
+
 const hasSupabaseEnv =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
   !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -156,6 +166,48 @@ export const getRecordingLibrary = cache(async () => {
   } catch (error) {
     console.warn("Failed to load recordings, using mock data", error);
     return mockRecordings;
+  }
+});
+
+export const getSphereBySlug = cache(async (slug: string) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    const fallback = featuredSpheres.find((s) => s.slug === slug);
+    return { sphere: fallback || null, rooms: [] as VideoRoom[] };
+  }
+
+  try {
+    const { data: sphere, error } = await supabase
+      .from("spheres_public_view")
+      .select(
+        "id, slug, title, description, tags, creator_handle, live_count, spectator_count, recordings_count, last_recording_at, accent, created_at",
+      )
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+    if (!sphere) {
+      return { sphere: null, rooms: [] as VideoRoom[] };
+    }
+
+    const { data: rooms, error: roomError } = await supabase
+      .from("video_rooms")
+      .select("id, slug, title, description, status, is_private, created_at")
+      .eq("sphere_id", sphere.id)
+      .order("created_at", { ascending: false })
+      .limit(24);
+
+    if (roomError) {
+      throw roomError;
+    }
+
+    const normalized = normalizeSpheres([sphere as SphereRow])[0];
+    return { sphere: normalized, rooms: rooms ?? [] };
+  } catch (error) {
+    console.warn("Failed to fetch sphere detail", error);
+    return { sphere: null, rooms: [] as VideoRoom[] };
   }
 });
 
