@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffe5d9;
+  --foreground: #22223b;
+}
+
+@theme inline {
+  --font-sans: var(--font-nunito);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-peach: #ffe5d9;
+  --color-peach-strong: #ffd7c2;
+  --color-rose: #ffb6b9;
+  --color-rose-soft: #fce2e5;
+  --color-gold: #ffd166;
+  --color-red: #e63946;
+  --color-charcoal: #22223b;
+  --color-cream: #fff1eb;
+  --radius-full: 999px;
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #fff1eb, #ffe5d9 45%, #ffd7c2 80%);
+  color: var(--foreground);
+  font-family: var(--font-nunito), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.soft-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(230, 57, 70, 0.08) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+.glass-panel {
+  backdrop-filter: blur(22px);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 214, 102, 0.3);
+  box-shadow: 0 25px 70px rgba(34, 34, 59, 0.15);
+}
+
+.pill {
+  border-radius: 999px;
+  border: 1px solid rgba(34, 34, 59, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.35rem 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}

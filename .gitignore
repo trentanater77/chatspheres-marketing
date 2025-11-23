@@ -1,0 +1,6 @@
+all info for frontend chatspheres
+all-info-for-frontend-chatspheres.local
+.env*
+node_modules
+.next
+

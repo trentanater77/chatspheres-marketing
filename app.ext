@@ -1,0 +1,76 @@
+## Chatspheres.com Rebuild Feature Plan
+
+This document outlines the feature goals for the new Next.js + TypeScript + Tailwind marketing/front‑door experience for `chatspheres.com`, which will link out to the existing `sphere.chatspheres.com` video chat property while keeping both deployments separate.
+
+### Core Pages & Experience
+- **Home + Explore overhaul**: rewrite hero, value props, CTA stack, and Explore grid so it feels MVP-ready (ideally better) with clearer layout, filtering, contextual stats, and Reddit-inspired surfacing of spheres.
+- **Forum + room hierarchy**: every sphere acts like a subreddit (`/forum?slug=topic`), containing multiple sphere rooms (video chats) curated around that topic; creation flow must feel like spinning up a community with embedded video rooms.
+- **Consistent navigation shell**: shared header/footer + sidebar that stays in sync across pages; after major UI fixes, propagate the updated sidebar everywhere in one pass to ensure consistency.
+- **Responsive design**: enforce layouts that degrade gracefully from mobile → desktop; do a final cross-device QA pass after most features land.
+- **Maintenance mode**: add a dedicated maintenance page featuring the cat GIF to flip on when the platform is undergoing fixes or incidents.
+
+### Content Quality Improvements
+- Require richer sphere descriptions (guidance + validation).
+- Rework tag chips for better spacing/formatting and wrap handling.
+- Optionally surface the sphere creator identity on each sphere detail page for credibility.
+
+### Moderation, Profiles & Settings UX
+- Provide theme / layout controls so moderators can adjust their panel look & feel (compact vs spacious, dark vs light accents, etc.).
+- Redesign the settings panel UI (forms, toggles, feedback states) for clarity and accessibility.
+- Build profile settings, moderation tools, and a future-ready matchmaking toggle (matchmaking feature ships last; sphere/room flow launches first).
+
+### Sidebar & Live Stats
+- Sidebar should display contextual stats (followers, participants, recording count) with conditional sections; hide blocks when data is missing.
+- When two or more participants are active in a sphere, show a `Live` tag or indicator in both Explore cards and the sidebar.
+- Dynamically display spectator counts and participant totals without requiring manual refreshes; integrate LiveKit/Supabase events so the data auto-updates.
+
+### Recordings & Sharing
+- Add community recordings: allow uploading your own or surfacing approved recordings so visitors can view past chats.
+- Generate consumable shareable links (deep links to spheres, recordings, or onboarding flows) to help viral loops and marketing campaigns.
+- Make recordings browsable so users can discover other conversations (with moderation controls).
+
+### Plans, Auth & Payments
+- Implement Supabase Auth (login + signup) and gate the experience so visitors must authenticate before engaging; wiring is required day one.
+- Define plan tiers (Free, Pro, etc.) with Supabase-enforced usage limits (room creation, recording minutes, spectator caps). Document how those limits map to both the marketing site and the LiveKit wrapper so extending them later is easy.
+- Build pricing + plan comparison sections explaining the limits and benefits.
+- Integrate Stripe checkout/billing (likely Stripe Checkout + Customer Portal) to handle plan upgrades/downgrades.
+
+### Infrastructure & Scaling Notes
+- Add or verify subdomain/domain mappings so the new marketing site deploys cleanly (e.g., Vercel or Netlify) while `sphere.chatspheres.com` stays on Netlify.
+- Plan for removing Xano (target: Monday). Identify every endpoint currently backed by Xano and replace with Supabase or Next.js API routes before sunsetting.
+- Document what additional plans/services might be needed as usage scales (Supabase tiers, LiveKit costs, Firebase, Stripe fees, analytics, etc.).
+- Ensure live auto-refresh behavior for stats and Explore listings (no manual reloads) using Supabase real-time or polling where necessary.
+
+### Consistency & Polish Checklist
+- After completing major sidebar/front-end changes, snapshot the final component and roll it out across all routes to ensure identical styling/behavior.
+- Verify responsive behavior and cross-browser consistency as the last step before launch.
+
+### Branding & Visual Direction
+- Follow the provided palette (reds/golds/rose/charcoal) and avoid blues/greens entirely.
+- Prefer a warm peach/off-white background instead of a stark white canvas so the experience feels unique; sprinkle intersecting-circle motifs and subtle cat/Pokémon nods.
+- Use Nunito for all typography (bold sentence-case headlines, bold caps/small-caps for chips).
+- Buttons: pill/rounded CTA using the provided gold/red styles; chips follow the supplied spec.
+- Logos: keep the vesica piscis overlap with white outer stroke and red inner stroke; honor the SVG reference provided.
+
+### Real-Time Status Features
+- Live spectator count and participant totals update automatically.
+- Live badges appear the moment 2+ people are active in a room.
+- Show per-sphere stats (recordings, followers, active rooms) on the sidebar and Explore cards with conditional rendering so empty states feel intentional.
+
+### Matchmaking (Later Phase)
+- After the main forum/sphere experience ships, add a topic-based matchmaking flow that pairs users 1-on-1 based on mood/topic preferences.
+- This feature depends on Supabase or custom matching logic; we will scope it after the core experience is stable.
+
+### Inputs Needed from You
+- **Supabase**: project URL, anon/public key, service role key (if server actions need it), list of existing tables (spheres, rooms, users, matchmaking, limits), and any current auth redirects.
+- **Xano**: list of endpoints still in use plus what each endpoint powers, so we can rebuild them in Next.js/Supabase.
+- **Stripe**: publishable + secret keys (test mode), desired plan IDs/prices, and any coupon logic.
+- **Limits**: definition of Free vs Pro (or other) usage caps (rooms per day, recording minutes, spectator count, etc.).
+- **Brand assets**: high-res logos/SVGs, any imagery, copy you want reused, and guidance on peach background shade if you have a favorite.
+- **Cat GIF**: the exact asset (or source) for the maintenance page.
+- **Hosting/DNS**: confirmation of whether we’re targeting Vercel (preferred) or Netlify for `chatspheres.com`, plus DNS access when ready to point the domain.
+- **Existing implementation notes**: anything in the current WeWeb flow we should preserve (copy, animations) and confirmation of which credentials already live in the `wrapper` project.
+
+Once these inputs are ready, we can scaffold the Next.js project inside this `App.next` workspace and begin implementing the features above.
+
+
