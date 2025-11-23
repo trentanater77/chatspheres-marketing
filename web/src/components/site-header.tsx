@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Explore", href: "#explore" },
   { label: "Recordings", href: "#recordings" },
   { label: "Pricing", href: "#pricing" },
+  { label: "Moderation", href: "/moderation" },
 ];
 
 export function SiteHeader() {

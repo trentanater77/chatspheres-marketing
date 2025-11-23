@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { useSupabase } from "./providers/supabase-provider";
 
 const themes = [
   { value: "warm", label: "Warm" },
@@ -13,9 +14,43 @@ const themes = [
 export function ModerationPanelPreview() {
   const [theme, setTheme] = useState<typeof themes[number]["value"]>("warm");
   const [density, setDensity] = useState(70);
+  const [targetUser, setTargetUser] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const { session, openAuth } = useSupabase();
 
   const accent =
     theme === "noir" ? "bg-[#22223B] text-white" : theme === "compact" ? "bg-white text-[#22223B]" : "bg-[#FFF1EB] text-[#22223B]";
+
+  const triggerAction = async (action: string) => {
+    if (!session) {
+      openAuth();
+      return;
+    }
+    if (!targetUser) {
+      setMessage("Enter a target user ID first.");
+      return;
+    }
+    setMessage("Saving action…");
+    try {
+      const res = await fetch("/api/moderation/actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          moderatorId: session.user.id,
+          targetUserId: targetUser,
+          action,
+          reason: "UI preview",
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      setMessage("Action logged to moderation_logs.");
+    } catch (error) {
+      console.error(error);
+      setMessage("Unable to log action. Check Supabase table + RLS.");
+    }
+  };
 
   return (
     <div className="rounded-[32px] border border-white/60 bg-white/80 p-6 shadow-[0_30px_80px_rgba(34,34,59,0.12)]">
@@ -40,8 +75,20 @@ export function ModerationPanelPreview() {
         ))}
       </div>
 
+      <div className="mt-4">
+        <label className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#22223B]/60">
+          Target user ID
+        </label>
+        <input
+          value={targetUser}
+          onChange={(e) => setTargetUser(e.target.value)}
+          placeholder="f7e7f547-a0f9-4612..."
+          className="mt-2 w-full rounded-2xl border border-[#22223B]/10 bg-white px-4 py-2 text-sm text-[#22223B]"
+        />
+      </div>
+
       <div className="mt-6 rounded-[24px] border border-[#FFD166]/40 bg-[#FFF1EB]/80 p-4">
-      <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">preview</p>
+        <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">preview</p>
         <div
           className={cn(
             "mt-3 grid gap-4 rounded-2xl border border-white/80 p-4 text-sm shadow-sm",
@@ -51,7 +98,7 @@ export function ModerationPanelPreview() {
         >
           <div className="flex items-center justify-between">
             <p className="font-semibold">Spectator chat</p>
-            <Button variant="ghost" className="px-3 py-1 text-xs">
+            <Button variant="ghost" className="px-3 py-1 text-xs" onClick={() => triggerAction("mute_all")}>
               Mute all
             </Button>
           </div>
@@ -61,10 +108,14 @@ export function ModerationPanelPreview() {
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="rounded-xl border border-white/50 bg-white/60 p-3 text-xs text-[#22223B]">
               <p className="font-semibold text-sm">Actions</p>
-              <ul className="mt-1 list-disc pl-4">
-                <li>Shadow-ban spectator</li>
-                <li>Escalate to cat-mode 🐾</li>
-              </ul>
+              <div className="mt-2 flex flex-col gap-2">
+                <Button variant="secondary" onClick={() => triggerAction("shadow_ban")}>
+                  Shadow ban
+                </Button>
+                <Button variant="secondary" onClick={() => triggerAction("escalate_cat_mode")}>
+                  Escalate to cat-mode 🐾
+                </Button>
+              </div>
             </div>
             <div className="rounded-xl border border-white/50 bg-white/60 p-3 text-xs text-[#22223B]">
               <p className="font-semibold text-sm">Theme</p>
@@ -80,6 +131,7 @@ export function ModerationPanelPreview() {
             </div>
           </div>
         </div>
+        {message && <p className="mt-3 text-xs text-[#22223B]/70">{message}</p>}
       </div>
     </div>
   );

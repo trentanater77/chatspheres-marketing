@@ -13,6 +13,7 @@ export const siteConfig = {
     { label: "Explore", href: "/explore" },
     { label: "Pricing", href: "/pricing" },
     { label: "For Communities", href: "/spheres" },
+    { label: "Moderation", href: "/moderation" },
   ],
 };
 
