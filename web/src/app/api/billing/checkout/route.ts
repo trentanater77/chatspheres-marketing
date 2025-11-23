@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Stripe is not configured yet." }, { status: 500 });
   }
 
-  const { priceId, planName } = await request.json();
+  const { priceId, planName, userId, customerEmail } = await request.json();
 
   if (!priceId) {
     return NextResponse.json({ error: "Missing priceId parameter" }, { status: 400 });
@@ -29,10 +29,12 @@ export async function POST(request: NextRequest) {
         },
       ],
       allow_promotion_codes: true,
-      success_url: `${siteUrl}/pricing?status=success`,
+      customer_email: customerEmail || undefined,
+      success_url: `${siteUrl}/pricing?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/pricing?status=cancelled`,
       metadata: {
         planName: planName || "",
+        userId: userId || "",
       },
     });
 

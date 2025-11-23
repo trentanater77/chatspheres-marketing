@@ -31,7 +31,12 @@ export function UpgradeButton({ priceId, label, planName, variant = "primary" }:
       const response = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId, planName }),
+        body: JSON.stringify({
+          priceId,
+          planName,
+          userId: session.user.id,
+          customerEmail: session.user.email,
+        }),
       });
       if (!response.ok) {
         throw new Error(await response.text());
