@@ -54,6 +54,25 @@ type VideoRoom = {
   created_at: string | null;
 };
 
+type MatchRequestRow = {
+  id: string;
+  user_id: string;
+  moods: string[] | null;
+  topic: string | null;
+  status: string;
+  created_at: string;
+};
+
+type ModerationLogRow = {
+  id: number;
+  moderator_id: string;
+  target_user_id: string;
+  action: string;
+  reason: string | null;
+  sphere_id: string | null;
+  created_at: string;
+};
+
 const hasSupabaseEnv =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
   !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -208,6 +227,48 @@ export const getSphereBySlug = cache(async (slug: string) => {
   } catch (error) {
     console.warn("Failed to fetch sphere detail", error);
     return { sphere: null, rooms: [] as VideoRoom[] };
+  }
+});
+
+export const getMatchRequests = cache(async (limit = 20) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return [] as MatchRequestRow[];
+  }
+  try {
+    const { data, error } = await supabase
+      .from("match_requests")
+      .select("id, user_id, moods, topic, status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) {
+      throw error;
+    }
+    return data ?? [];
+  } catch (error) {
+    console.warn("Failed to load match requests", error);
+    return [];
+  }
+});
+
+export const getModerationLogs = cache(async (limit = 20) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return [] as ModerationLogRow[];
+  }
+  try {
+    const { data, error } = await supabase
+      .from("moderation_logs")
+      .select("id, moderator_id, target_user_id, action, reason, sphere_id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) {
+      throw error;
+    }
+    return data ?? [];
+  } catch (error) {
+    console.warn("Failed to load moderation logs", error);
+    return [];
   }
 });
 
