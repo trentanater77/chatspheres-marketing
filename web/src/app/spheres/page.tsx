@@ -17,6 +17,9 @@ export default async function SpheresIndexPage() {
         <p className="text-sm text-[#22223B]/70">
           Each sphere mirrors a subreddit-like feed, but with built-in LiveKit rooms and spectator slots.
         </p>
+        <ButtonLink href="/spheres/create" variant="secondary">
+          Create a sphere
+        </ButtonLink>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -60,8 +63,8 @@ export default async function SpheresIndexPage() {
         <p className="text-sm text-[#22223B]/70">
           Use the Share Link Lab or click below to authenticate and start hosting within Spark.
         </p>
-        <ButtonLink href="#top" className="mt-4">
-          Back to hero
+        <ButtonLink href="/spheres/create" className="mt-4">
+          Create a sphere
         </ButtonLink>
       </div>
     </div>

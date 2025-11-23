@@ -12,5 +12,6 @@ export const siteLinks = {
   constellationSignup: "/auth?plan=constellation",
   maintenance: "/maintenance",
   dashboard: "https://sphere.chatspheres.com/dashboard",
+  createSphere: "/spheres/create",
 };
 
