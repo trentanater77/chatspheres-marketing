@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, siteLinks } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useSupabase } from "./providers/supabase-provider";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ export function SiteHeader() {
 
   const handleAuthClick = () => {
     if (session) {
-      router.push("https://sphere.chatspheres.com/dashboard");
+      router.push(siteLinks.dashboard);
       return;
     }
     openAuth();
@@ -67,7 +67,7 @@ export function SiteHeader() {
             {session ? "Dashboard" : "Sign in"}
           </Button>
           <Link
-            href="https://sphere.chatspheres.com"
+            href={siteLinks.app}
             className="rounded-full bg-[#FFD166] px-5 py-2 text-sm font-bold text-[#22223B] transition hover:bg-[#e63946] hover:text-white shadow-[0_15px_30px_rgba(230,57,70,0.15)]"
           >
             Launch video chat

@@ -23,9 +23,21 @@ export type PlanTier = {
   description: string;
   limits: string[];
   tag?: string;
-  productIdMonthly: string | null;
-  productIdYearly: string | null;
+  productIdMonthly?: string | null;
+  productIdYearly?: string | null;
+  priceMonthlyId?: string | null;
+  priceYearlyId?: string | null;
   adSupported?: boolean;
+  freeRedirect?: string;
+};
+
+const stripePriceIds = {
+  sparkPlusMonthly: process.env.NEXT_PUBLIC_STRIPE_SPARK_PLUS_MONTHLY_PRICE ?? null,
+  sparkPlusYearly: process.env.NEXT_PUBLIC_STRIPE_SPARK_PLUS_YEARLY_PRICE ?? null,
+  orbitMonthly: process.env.NEXT_PUBLIC_STRIPE_ORBIT_MONTHLY_PRICE ?? null,
+  orbitYearly: process.env.NEXT_PUBLIC_STRIPE_ORBIT_YEARLY_PRICE ?? null,
+  constellationMonthly: process.env.NEXT_PUBLIC_STRIPE_CONSTELLATION_MONTHLY_PRICE ?? null,
+  constellationYearly: process.env.NEXT_PUBLIC_STRIPE_CONSTELLATION_YEARLY_PRICE ?? null,
 };
 
 export const planTiers: PlanTier[] = [
@@ -44,6 +56,7 @@ export const planTiers: PlanTier[] = [
     productIdMonthly: "prod_TTcmgZHzUcoNkq",
     productIdYearly: null,
     adSupported: true,
+    freeRedirect: "https://sphere.chatspheres.com",
   },
   {
     name: "Spark+",
@@ -57,6 +70,8 @@ export const planTiers: PlanTier[] = [
     ],
     productIdMonthly: "prod_TTd0VVKgssRQta",
     productIdYearly: "prod_TTd2Iv3hy6eQav",
+    priceMonthlyId: stripePriceIds.sparkPlusMonthly,
+    priceYearlyId: stripePriceIds.sparkPlusYearly,
   },
   {
     name: "Orbit",
@@ -72,6 +87,8 @@ export const planTiers: PlanTier[] = [
     tag: "Most popular",
     productIdMonthly: "prod_TTcmLhL84sOEqr",
     productIdYearly: "prod_TTd3weD7DMTncn",
+    priceMonthlyId: stripePriceIds.orbitMonthly,
+    priceYearlyId: stripePriceIds.orbitYearly,
   },
   {
     name: "Constellation",
@@ -86,6 +103,8 @@ export const planTiers: PlanTier[] = [
     ],
     productIdMonthly: "prod_TTclmSYFM4yUCm",
     productIdYearly: "prod_TTd4eoFfW8xYmv",
+    priceMonthlyId: stripePriceIds.constellationMonthly,
+    priceYearlyId: stripePriceIds.constellationYearly,
   },
 ];
 

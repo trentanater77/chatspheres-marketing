@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button, ButtonLink } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { useSupabase } from "./providers/supabase-provider";
 
 const modes = [
   { value: "spectator", label: "Spectator link" },
@@ -14,6 +15,7 @@ export function ShareLinkLab() {
   const [slug, setSlug] = useState("faith-and-focus");
   const [mode, setMode] = useState<(typeof modes)[number]["value"]>("spectator");
   const [copied, setCopied] = useState(false);
+  const { session, openAuth } = useSupabase();
 
   const baseMarketing = process.env.NEXT_PUBLIC_SITE_URL || "https://chatspheres.com";
   const baseApp = process.env.NEXT_PUBLIC_VIDEO_APP_URL || "https://sphere.chatspheres.com";
@@ -28,6 +30,21 @@ export function ShareLinkLab() {
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
+
+  if (!session) {
+    return (
+      <div className="rounded-[32px] border border-white/60 bg-white/80 p-6 shadow-[0_30px_80px_rgba(34,34,59,0.12)]">
+        <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">shareable links</p>
+        <h3 className="mt-3 text-2xl font-bold text-[#22223B]">Sign in to generate live links.</h3>
+        <p className="text-sm text-[#22223B]/70">
+          Spark tier includes branded share links. Authenticate to pull your sphere slug history.
+        </p>
+        <Button className="mt-4" onClick={openAuth}>
+          Sign in
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-[32px] border border-white/60 bg-white/80 p-6 shadow-[0_30px_80px_rgba(34,34,59,0.12)]">

@@ -11,10 +11,10 @@ export function HeroCtas() {
 
   const handleSparkClick = () => {
     if (session) {
-      router.push(siteLinks.app);
-    } else {
-      openAuth();
+      router.push(siteLinks.dashboard);
+      return;
     }
+    openAuth();
   };
 
   return (

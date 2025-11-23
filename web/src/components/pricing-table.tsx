@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { planTiers } from "@/config/site";
-import { ButtonLink } from "./ui/button";
+import { Button } from "./ui/button";
+import { useSupabase } from "./providers/supabase-provider";
+import { UpgradeButton } from "./upgrade-button";
 
 export function PricingTable() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const { openAuth, session } = useSupabase();
 
   return (
     <div className="rounded-3xl border border-white/50 bg-white/70 p-6 shadow-[0_25px_80px_rgba(34,34,59,0.12)]">
@@ -43,6 +46,8 @@ export function PricingTable() {
           const price =
             billingCycle === "monthly" ? plan.priceMonthly : plan.priceYearly || plan.priceMonthly;
           const isFree = price === 0;
+          const priceId =
+            billingCycle === "monthly" ? plan.priceMonthlyId ?? plan.productIdMonthly : plan.priceYearlyId ?? plan.productIdYearly;
 
           return (
             <div
@@ -83,13 +88,24 @@ export function PricingTable() {
                 ))}
               </ul>
 
-              <ButtonLink
-                href="/pricing"
-                variant={plan.adSupported ? "secondary" : "primary"}
-                className="mt-6 text-center"
-              >
-                {isFree ? "Get started" : "Choose plan"}
-              </ButtonLink>
+              {isFree ? (
+                <Button
+                  className="mt-6"
+                  variant={plan.adSupported ? "secondary" : "primary"}
+                  onClick={() => (session ? window.location.assign(plan.freeRedirect || "/") : openAuth())}
+                >
+                  {session ? "Open dashboard" : "Get started"}
+                </Button>
+              ) : (
+                <div className="mt-6">
+                  <UpgradeButton
+                    priceId={priceId}
+                    label={`Upgrade to ${plan.name}`}
+                    planName={plan.name}
+                    variant={plan.adSupported ? "secondary" : "primary"}
+                  />
+                </div>
+              )}
             </div>
           );
         })}
