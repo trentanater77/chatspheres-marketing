@@ -3,10 +3,14 @@ import { SiteFooter } from "@/components/site-footer";
 import { ButtonLink } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
 import { PricingTable } from "@/components/pricing-table";
-import { featuredSpheres, marketingPoints, recordings, statBlocks } from "@/data/mock";
+import { marketingPoints } from "@/data/mock";
 import { siteLinks } from "@/lib/utils";
+import { getLandingData } from "@/lib/data";
+import { HeroCtas } from "@/components/hero-ctas";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { spheres, stats, recordings } = await getLandingData();
+
   return (
     <div id="top" className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -24,12 +28,7 @@ export default function HomePage() {
                 —no dropdowns, no gatekeeping. Spin up rooms inside it and let spectators watch in
                 real time.
               </p>
-              <div className="flex flex-wrap gap-4">
-                <ButtonLink href={siteLinks.app}>Launch video chat</ButtonLink>
-                <ButtonLink href="#pricing" variant="secondary">
-                  See pricing
-                </ButtonLink>
-              </div>
+              <HeroCtas />
               <div className="flex flex-wrap gap-8 text-sm text-[#22223B]/80">
                 <p>Supabase auth mandatory • LiveKit rooms • Firebase replays • Netlify deploy.</p>
                 <p>Shareable links, recordings, spectator stats, and cat-powered maintenance mode.</p>
@@ -78,7 +77,7 @@ export default function HomePage() {
         </section>
 
         <section className="grid gap-4 sm:grid-cols-3">
-          {statBlocks.map((stat) => (
+          {stats.map((stat) => (
             <div
               key={stat.label}
               className="rounded-3xl border border-white/50 bg-white/60 p-6 text-center shadow-md"
@@ -107,7 +106,7 @@ export default function HomePage() {
             </ButtonLink>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            {featuredSpheres.map((sphere) => (
+            {spheres.map((sphere) => (
               <div
                 key={sphere.slug}
                 className="rounded-[32px] border border-white/60 bg-white/70 p-6 shadow-[0_25px_60px_rgba(34,34,59,0.15)]"
