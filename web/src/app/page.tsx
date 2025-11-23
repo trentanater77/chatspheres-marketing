@@ -7,6 +7,7 @@ import { marketingPoints } from "@/data/mock";
 import { siteLinks } from "@/lib/utils";
 import { getLandingData } from "@/lib/data";
 import { HeroCtas } from "@/components/hero-ctas";
+import { ShareLinkLab } from "@/components/share-link-lab";
 
 export default async function HomePage() {
   const { spheres, stats, recordings } = await getLandingData();
@@ -199,6 +200,10 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section>
+          <ShareLinkLab />
         </section>
 
         <section id="pricing">

@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { useSupabase } from "./providers/supabase-provider";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { label: "Home", href: "#top" },
@@ -9,6 +14,17 @@ const navLinks = [
 ];
 
 export function SiteHeader() {
+  const { session, openAuth } = useSupabase();
+  const router = useRouter();
+
+  const handleAuthClick = () => {
+    if (session) {
+      router.push("https://sphere.chatspheres.com/dashboard");
+      return;
+    }
+    openAuth();
+  };
+
   return (
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-[#FFE5D9]/70 border-b border-white/40">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -47,6 +63,9 @@ export function SiteHeader() {
           >
             Pricing
           </Link>
+          <Button variant="secondary" onClick={handleAuthClick} className="hidden md:inline-flex">
+            {session ? "Dashboard" : "Sign in"}
+          </Button>
           <Link
             href="https://sphere.chatspheres.com"
             className="rounded-full bg-[#FFD166] px-5 py-2 text-sm font-bold text-[#22223B] transition hover:bg-[#e63946] hover:text-white shadow-[0_15px_30px_rgba(230,57,70,0.15)]"
