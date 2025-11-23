@@ -12,6 +12,8 @@ import { PlanUsagePanel } from "@/components/plan-usage";
 import { CatSpotlight } from "@/components/cat-spotlight";
 import { ModeratorToolkit } from "@/components/moderator-toolkit";
 import { SidebarPreview } from "@/components/sidebar-preview";
+import { ModerationPanelPreview } from "@/components/moderation-panel-preview";
+import { MatchmakingCallout } from "@/components/matchmaking-callout";
 
 export default async function HomePage() {
   const { spheres, stats, recordings } = await getLandingData();
@@ -218,6 +220,11 @@ export default async function HomePage() {
         <section className="grid gap-6 md:grid-cols-2">
           <PlanUsagePanel />
           <ShareLinkLab />
+        </section>
+
+        <section className="grid gap-6 md:grid-cols-2">
+          <ModerationPanelPreview />
+          <MatchmakingCallout />
         </section>
 
         <section id="pricing">
