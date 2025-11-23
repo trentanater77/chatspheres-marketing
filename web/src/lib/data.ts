@@ -61,6 +61,7 @@ type MatchRequestRow = {
   topic: string | null;
   status: string;
   created_at: string;
+  room_slug?: string | null;
 };
 
 type ModerationLogRow = {

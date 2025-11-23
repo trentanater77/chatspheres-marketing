@@ -10,12 +10,23 @@ export function CreateSphereForm() {
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!session) {
       openAuth();
+      return;
+    }
+    if (topicName.trim().length < 4) {
+      setStatus("error");
+      setErrorMessage("Topic name should be at least 4 characters.");
+      return;
+    }
+    if (description.trim().length < 20) {
+      setStatus("error");
+      setErrorMessage("Description should be at least 20 characters.");
       return;
     }
     setStatus("loading");
@@ -40,12 +51,14 @@ export function CreateSphereForm() {
       const json = await response.json();
       setCreatedSlug(json.sphere.slug);
       setStatus("success");
+      setErrorMessage(null);
       setTopicName("");
       setDescription("");
       setTags("");
     } catch (error) {
       console.error(error);
       setStatus("error");
+      setErrorMessage("Unable to create sphere right now. Please try again.");
     }
   };
 
@@ -82,9 +95,7 @@ export function CreateSphereForm() {
       <Button type="submit" disabled={status === "loading"}>
         {status === "loading" ? "Creating…" : session ? "Create sphere" : "Sign in to create"}
       </Button>
-      {status === "error" && (
-        <p className="text-sm text-[#e63946]">Unable to create sphere right now. Please try again.</p>
-      )}
+      {status === "error" && errorMessage && <p className="text-sm text-[#e63946]">{errorMessage}</p>}
       {status === "success" && createdSlug && (
         <p className="text-sm text-[#22223B]/70">
           Sphere created! Share slug <span className="font-semibold">sphere/{createdSlug}</span> or head to{" "}

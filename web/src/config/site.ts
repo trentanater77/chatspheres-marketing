@@ -14,6 +14,7 @@ export const siteConfig = {
     { label: "Pricing", href: "/pricing" },
     { label: "For Communities", href: "/spheres" },
     { label: "Moderation", href: "/moderation" },
+    { label: "Profile", href: "/settings/profile" },
   ],
 };
 

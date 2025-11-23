@@ -14,6 +14,7 @@ import { ModeratorToolkit } from "@/components/moderator-toolkit";
 import { SidebarPreview } from "@/components/sidebar-preview";
 import { ModerationPanelPreview } from "@/components/moderation-panel-preview";
 import { MatchmakingCallout } from "@/components/matchmaking-callout";
+import { LiveStatsTicker } from "@/components/live-stats-ticker";
 
 export default async function HomePage() {
   const { spheres, stats, recordings } = await getLandingData();
@@ -82,6 +83,8 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        <LiveStatsTicker />
 
         <section className="grid gap-4 sm:grid-cols-3">
           {stats.map((stat) => (
