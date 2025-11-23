@@ -1,11 +1,14 @@
-import { featuredSpheres } from "@/data/mock";
 import { ButtonLink } from "@/components/ui/button";
+import { getExploreSpheres } from "@/lib/data";
+import { siteLinks } from "@/lib/utils";
 
 export const metadata = {
   title: "Explore Spheres — Chatspheres",
 };
 
-export default function ExplorePage() {
+export default async function ExplorePage() {
+  const spheres = await getExploreSpheres();
+
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-16">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -16,10 +19,10 @@ export default function ExplorePage() {
             Each sphere is typed into existence by its creator. No templates, no pre-defined topics.
           </p>
         </div>
-        <ButtonLink href="/auth?plan=spark">Create your sphere</ButtonLink>
+        <ButtonLink href={siteLinks.sparkSignup}>Create your sphere</ButtonLink>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
-        {featuredSpheres.map((sphere) => (
+        {spheres.map((sphere) => (
           <div key={sphere.slug} className="rounded-[28px] border border-white/60 bg-white/70 p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -44,6 +47,20 @@ export default function ExplorePage() {
                   {tag}
                 </span>
               ))}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-6 text-sm text-[#22223B]">
+              <div>
+                <p className="text-xl font-bold">{sphere.spectators}</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#22223B]/60">spectators</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold">{sphere.recordings}</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#22223B]/60">recordings</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold">{sphere.lastRecordingAt}</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#22223B]/60">last replay</p>
+              </div>
             </div>
           </div>
         ))}

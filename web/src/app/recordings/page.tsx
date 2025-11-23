@@ -1,11 +1,13 @@
-import { recordings } from "@/data/mock";
 import { ButtonLink } from "@/components/ui/button";
+import { getRecordingLibrary } from "@/lib/data";
 
 export const metadata = {
   title: "Recordings — Chatspheres",
 };
 
-export default function RecordingsPage() {
+export default async function RecordingsPage() {
+  const recordingLibrary = await getRecordingLibrary();
+
   return (
     <div className="mx-auto flex min-h-screen max-w-4xl flex-col gap-8 px-4 py-16">
       <div className="text-center">
@@ -17,7 +19,7 @@ export default function RecordingsPage() {
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-3">
-        {recordings.map((rec) => (
+        {recordingLibrary.map((rec) => (
           <div key={rec.title} className="rounded-[24px] border border-white/60 bg-white/80 p-5">
             <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">{rec.sphere}</p>
             <h3 className="mt-2 text-lg font-semibold text-[#22223B]">{rec.title}</h3>

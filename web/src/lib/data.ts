@@ -44,13 +44,27 @@ export type LandingStats = {
   subtext: string;
 };
 
-export const getLandingData = cache(async () => {
-  const hasEnv =
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const hasSupabaseEnv =
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-  if (!hasEnv) {
-    console.warn("Supabase env vars missing, using mock landing data.");
+function getSupabaseClient() {
+  if (!hasSupabaseEnv) {
+    return null;
+  }
+  try {
+    return getSupabaseServiceRoleClient();
+  } catch (error) {
+    console.warn("Unable to instantiate Supabase client", error);
+    return null;
+  }
+}
+
+export const getLandingData = cache(async () => {
+  const supabase = getSupabaseClient();
+
+  if (!supabase) {
+    console.warn("Supabase env vars missing or invalid, using mock landing data.");
     return {
       spheres: featuredSpheres,
       stats: mockStats,
@@ -59,8 +73,6 @@ export const getLandingData = cache(async () => {
   }
 
   try {
-    const supabase = getSupabaseServiceRoleClient();
-
     const [{ data: spheres, error: spheresError }, { data: statsRows, error: statsError }, { data: recs, error: recError }] =
       await Promise.all([
         supabase
@@ -94,6 +106,56 @@ export const getLandingData = cache(async () => {
       stats: mockStats,
       recordings: mockRecordings,
     };
+  }
+});
+
+export const getExploreSpheres = cache(async () => {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return featuredSpheres;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("spheres_public_view")
+      .select(
+        "slug, title, description, tags, creator_handle, live_count, spectator_count, recordings_count, last_recording_at, accent",
+      )
+      .order("live_count", { ascending: false })
+      .limit(40);
+
+    if (error) {
+      console.warn("Failed to load spheres, using mock data", error);
+      return featuredSpheres;
+    }
+    return normalizeSpheres(data);
+  } catch (error) {
+    console.warn("Failed to load spheres, using mock data", error);
+    return featuredSpheres;
+  }
+});
+
+export const getRecordingLibrary = cache(async () => {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return mockRecordings;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("recordings_public_view")
+      .select("id, title, sphere_title, playback_url, duration_label")
+      .order("recorded_at", { ascending: false })
+      .limit(24);
+
+    if (error) {
+      console.warn("Failed to load recordings, using mock data", error);
+      return mockRecordings;
+    }
+    return normalizeRecordings(data);
+  } catch (error) {
+    console.warn("Failed to load recordings, using mock data", error);
+    return mockRecordings;
   }
 });
 
