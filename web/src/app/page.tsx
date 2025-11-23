@@ -9,6 +9,9 @@ import { getLandingData } from "@/lib/data";
 import { HeroCtas } from "@/components/hero-ctas";
 import { ShareLinkLab } from "@/components/share-link-lab";
 import { PlanUsagePanel } from "@/components/plan-usage";
+import { CatSpotlight } from "@/components/cat-spotlight";
+import { ModeratorToolkit } from "@/components/moderator-toolkit";
+import { SidebarPreview } from "@/components/sidebar-preview";
 
 export default async function HomePage() {
   const { spheres, stats, recordings } = await getLandingData();
@@ -171,6 +174,15 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="grid gap-6 md:grid-cols-2">
+          <CatSpotlight />
+          <ModeratorToolkit />
+        </section>
+
+        <section>
+          <SidebarPreview />
         </section>
 
         <section id="recordings" className="space-y-6">
