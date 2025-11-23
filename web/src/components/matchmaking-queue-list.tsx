@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { useSupabase } from "./providers/supabase-provider";
 
 type MatchRequest = {
   id: string;
@@ -15,10 +16,16 @@ type MatchRequest = {
 export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequest[] }) {
   const [queue, setQueue] = useState(initialQueue);
   const [message, setMessage] = useState<string | null>(null);
+  const { session, openAuth } = useSupabase();
 
   const pairRequest = async (requestId: string) => {
     setMessage(null);
     try {
+      if (!session) {
+        openAuth();
+        return;
+      }
+
       const response = await fetch("/api/matchmaking/pair", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,6 +40,16 @@ export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequ
         prev.map((req) => (pairedIds.includes(req.id) ? { ...req, status: "paired" } : req)),
       );
       setMessage(json.message || "Paired!");
+
+      await fetch("/api/matchmaking/livekit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participantA: pairedIds[0],
+          participantB: pairedIds[1],
+          roomSlug: json.roomSlug,
+        }),
+      });
     } catch (error) {
       console.error(error);
       setMessage(error instanceof Error ? error.message : "Pairing failed");
