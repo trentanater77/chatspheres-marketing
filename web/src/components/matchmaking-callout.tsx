@@ -16,6 +16,34 @@ export function MatchmakingCallout() {
     setSelected((prev) => (prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood]));
   };
 
+  const instantiateRoom = async () => {
+    if (!topic || topic.length < 4) {
+      setStatus("error");
+      return;
+    }
+    setStatus("loading");
+    try {
+      const response = await fetch("/api/spheres/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topicName: topic,
+          description: `${topic} matchmaking preview.`,
+          tags: selected,
+          userId: session?.user?.id || "system",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const json = await response.json();
+      return json.sphere?.slug;
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!session) {
       openAuth();
@@ -25,7 +53,11 @@ export function MatchmakingCallout() {
       setStatus("error");
       return;
     }
-    setStatus("loading");
+    const slug = await instantiateRoom();
+    if (!slug) {
+      setStatus("error");
+      return;
+    }
     try {
       const response = await fetch("/api/matchmaking/request", {
         method: "POST",
@@ -34,6 +66,7 @@ export function MatchmakingCallout() {
           moods: selected,
           topic,
           userId: session.user.id,
+          sphereSlug: slug,
         }),
       });
       if (!response.ok) {

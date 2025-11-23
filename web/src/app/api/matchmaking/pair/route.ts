@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
     }
 
     const roomSlug = `match-${nanoid(8)}`;
+    const sphereSlug = current.sphere_slug || partner.sphere_slug || null;
+
     const updates = [
       supabase.from("match_requests").update({ status: "paired", room_slug: roomSlug }).eq("id", current.id),
       supabase.from("match_requests").update({ status: "paired", room_slug: roomSlug }).eq("id", partner.id),
@@ -48,7 +50,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       roomSlug,
-      pairedIds: [current.id, partner.id],
+      sphereSlug,
+      participants: [
+        { requestId: current.id, userId: current.user_id, sphereSlug },
+        { requestId: partner.id, userId: partner.user_id, sphereSlug },
+      ],
       message: "Match found! LiveKit controller can now open the room.",
     });
   } catch (error) {

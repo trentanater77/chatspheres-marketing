@@ -11,6 +11,8 @@ type MatchRequest = {
   topic: string | null;
   status: string;
   created_at: string;
+  sphere_slug?: string | null;
+  room_slug?: string | null;
 };
 
 export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequest[] }) {
@@ -35,9 +37,9 @@ export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequ
       if (!response.ok) {
         throw new Error(json.error || "Pairing failed");
       }
-      const pairedIds: string[] = json.pairedIds || [];
+      const participants: Array<{ requestId: string; userId: string; sphereSlug: string | null }> = json.participants || [];
       setQueue((prev) =>
-        prev.map((req) => (pairedIds.includes(req.id) ? { ...req, status: "paired" } : req)),
+        prev.map((req) => (participants.find((p) => p.requestId === req.id) ? { ...req, status: "paired", room_slug: json.roomSlug } : req)),
       );
       setMessage(json.message || "Paired!");
 
@@ -45,9 +47,9 @@ export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequ
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participantA: pairedIds[0],
-          participantB: pairedIds[1],
           roomSlug: json.roomSlug,
+          sphereSlug: json.sphereSlug,
+          participants: participants.map((p) => p.userId),
         }),
       });
     } catch (error) {
@@ -72,6 +74,11 @@ export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequ
                 <p className="text-xs text-[#22223B]/60">
                   {req.moods?.join(", ") || "No moods"} • {req.status}
                 </p>
+                {req.sphere_slug && (
+                  <a href={`/spheres/${req.sphere_slug}`} className="text-xs font-semibold text-[#e63946] underline">
+                    {req.sphere_slug}
+                  </a>
+                )}
               </div>
               {req.status === "waiting" && (
                 <Button variant="secondary" onClick={() => pairRequest(req.id)}>

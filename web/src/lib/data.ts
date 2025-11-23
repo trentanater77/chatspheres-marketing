@@ -62,6 +62,7 @@ type MatchRequestRow = {
   status: string;
   created_at: string;
   room_slug?: string | null;
+  sphere_slug?: string | null;
 };
 
 type ModerationLogRow = {
@@ -72,6 +73,8 @@ type ModerationLogRow = {
   reason: string | null;
   sphere_id: string | null;
   created_at: string;
+  sphere_slug?: string | null;
+  spectra?: number | null;
 };
 
 const hasSupabaseEnv =
@@ -239,7 +242,7 @@ export const getMatchRequests = cache(async (limit = 20) => {
   try {
     const { data, error } = await supabase
       .from("match_requests")
-      .select("id, user_id, moods, topic, status, created_at")
+      .select("id, user_id, moods, topic, status, created_at, room_slug, sphere_slug")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error) {
@@ -260,7 +263,7 @@ export const getModerationLogs = cache(async (limit = 20) => {
   try {
     const { data, error } = await supabase
       .from("moderation_logs")
-      .select("id, moderator_id, target_user_id, action, reason, sphere_id, created_at")
+      .select("id, moderator_id, target_user_id, action, reason, sphere_id, created_at, sphere_slug")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error) {

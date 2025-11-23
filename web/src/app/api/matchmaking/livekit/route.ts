@@ -12,14 +12,15 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { participantA, participantB, roomSlug } = await request.json();
-    if (!participantA || !participantB || !roomSlug) {
-      return NextResponse.json({ error: "participantA, participantB, and roomSlug are required" }, { status: 400 });
+    const { participants, roomSlug, sphereSlug } = await request.json();
+    if (!Array.isArray(participants) || participants.length < 2 || !roomSlug) {
+      return NextResponse.json({ error: "participants (2) and roomSlug are required" }, { status: 400 });
     }
 
     const payload = {
       roomSlug,
-      participants: [participantA, participantB],
+      sphereSlug,
+      participants,
       tokenId: nanoid(8),
     };
 

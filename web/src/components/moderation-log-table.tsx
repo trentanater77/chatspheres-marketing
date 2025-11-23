@@ -8,6 +8,7 @@ type ModerationLog = {
   reason: string | null;
   sphere_id: string | null;
   created_at: string;
+  sphere_slug?: string | null;
 };
 
 export function ModerationLogTable({ logs }: { logs: ModerationLog[] }) {
@@ -38,7 +39,7 @@ export function ModerationLogTable({ logs }: { logs: ModerationLog[] }) {
               <td className="px-4 py-3 font-semibold">{log.action}</td>
               <td className="px-4 py-3 text-xs">{log.moderator_id}</td>
               <td className="px-4 py-3 text-xs">{log.target_user_id}</td>
-              <td className="px-4 py-3 text-xs">{log.sphere_id || "n/a"}</td>
+              <td className="px-4 py-3 text-xs">{log.sphere_slug || log.sphere_id || "n/a"}</td>
               <td className="px-4 py-3 text-xs">{log.reason || "-"}</td>
               <td className="px-4 py-3 text-xs">{new Date(log.created_at).toLocaleString()}</td>
             </tr>

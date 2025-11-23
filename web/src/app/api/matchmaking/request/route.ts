@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseServiceRoleClient();
     const body = await request.json();
-    const { moods, topic, userId } = body;
+    const { moods, topic, userId, sphereSlug } = body;
 
     if (!userId) {
       return NextResponse.json({ error: "userId is required" }, { status: 400 });
@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
       moods,
       topic,
       status: "waiting",
+      sphere_slug: sphereSlug,
       created_at: new Date().toISOString(),
     });
 
