@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { cn, siteLinks } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useSupabase } from "./providers/supabase-provider";
@@ -18,6 +19,7 @@ const navLinks = [
 export function SiteHeader() {
   const { session, openAuth } = useSupabase();
   const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleAuthClick = () => {
     if (session) {
@@ -25,6 +27,7 @@ export function SiteHeader() {
       return;
     }
     openAuth();
+    setMobileOpen(false);
   };
 
   return (
@@ -50,13 +53,65 @@ export function SiteHeader() {
               key={link.href}
               href={link.href}
               className="tracking-wide transition hover:text-[#e63946]"
+              onClick={() => setMobileOpen(false)}
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <button
+          type="button"
+          className="inline-flex flex-col items-end gap-1 md:hidden"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          aria-label="Toggle navigation"
+        >
+          <span className="block h-0.5 w-8 bg-[#22223B]" />
+          <span className="block h-0.5 w-6 bg-[#22223B]" />
+          <span className="block h-0.5 w-4 bg-[#22223B]" />
+        </button>
+
+        <div
+          className={cn(
+            "fixed inset-0 z-20 bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition md:hidden",
+            mobileOpen && "pointer-events-auto opacity-100",
+          )}
+          onClick={() => setMobileOpen(false)}
+        />
+
+        <nav
+          className={cn(
+            "fixed right-4 top-20 z-30 w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-white/60 bg-white/95 p-6 shadow-2xl transition md:hidden",
+            mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none",
+          )}
+        >
+          <div className="flex flex-col gap-4 text-sm font-semibold text-[#22223B]">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="tracking-wide transition hover:text-[#e63946]"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3">
+            <Button variant="secondary" onClick={handleAuthClick}>
+              {session ? "Dashboard" : "Sign in"}
+            </Button>
+            <Link
+              href={siteLinks.app}
+              className="rounded-full bg-[#FFD166] px-5 py-2 text-center text-sm font-bold text-[#22223B] transition hover:bg-[#e63946] hover:text-white shadow-[0_15px_30px_rgba(230,57,70,0.15)]"
+              onClick={() => setMobileOpen(false)}
+            >
+              Launch video chat
+            </Link>
+          </div>
+        </nav>
+
+        <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/pricing"
             className={cn(
