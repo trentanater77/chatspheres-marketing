@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { cn, siteLinks } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { Button, ButtonLink } from "./ui/button";
 import { useSupabase } from "./providers/supabase-provider";
 import { useRouter } from "next/navigation";
 
@@ -81,11 +81,11 @@ export function SiteHeader() {
 
         <nav
           className={cn(
-            "fixed right-4 top-20 z-30 w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-white/60 bg-white/95 p-6 shadow-2xl transition md:hidden",
+            "fixed right-4 top-20 z-30 w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-white/70 bg-white/95 p-7 shadow-2xl transition-all md:hidden",
             mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none",
           )}
         >
-          <div className="flex flex-col gap-6 text-lg font-medium text-[#22223B]">
+          <div className="flex flex-col gap-5 text-lg font-medium text-[#22223B]">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -97,8 +97,11 @@ export function SiteHeader() {
               </a>
             ))}
           </div>
-          <div className="mt-6 flex flex-col gap-3">
-            <Button variant="secondary" onClick={handleAuthClick}>
+          <div className="mt-8 flex flex-col gap-3">
+            <ButtonLink href={siteLinks.launchHost()} className="w-full text-center">
+              Launch
+            </ButtonLink>
+            <Button variant="secondary" className="w-full justify-center" onClick={handleAuthClick}>
               {session ? "Dashboard" : "Sign in"}
             </Button>
           </div>
@@ -113,6 +116,9 @@ export function SiteHeader() {
           >
             Pricing
           </Link>
+          <ButtonLink href={siteLinks.launchHost()} className="hidden md:inline-flex">
+            Launch
+          </ButtonLink>
           <Button variant="secondary" onClick={handleAuthClick} className="hidden md:inline-flex">
             {session ? "Dashboard" : "Sign in"}
           </Button>

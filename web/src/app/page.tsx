@@ -88,18 +88,22 @@ export default async function HomePage() {
           <LiveStatsTicker />
 
           <section className="grid gap-4 sm:grid-cols-3">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-3xl border border-white/50 bg-white/60 p-6 text-center shadow-md"
-            >
-              <p className="text-3xl font-extrabold text-[#22223B]">{stat.value}</p>
-              <p className="text-sm uppercase tracking-[0.4em] text-[#e63946] font-bold">
-                {stat.label}
-              </p>
-              <p className="text-sm text-[#22223B]/70">{stat.subtext}</p>
-            </div>
-          ))}
+            {stats.length ? (
+              stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-3xl border border-white/50 bg-white/60 p-6 text-center shadow-md"
+                >
+                  <p className="text-3xl font-extrabold text-[#22223B]">{stat.value}</p>
+                  <p className="text-sm uppercase tracking-[0.4em] text-[#e63946] font-bold">{stat.label}</p>
+                  <p className="text-sm text-[#22223B]/70">{stat.subtext}</p>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-3xl border border-dashed border-[#22223B]/20 bg-white/50 p-6 text-center text-sm text-[#22223B]/60 sm:col-span-3">
+                Live stats will light up once your first spheres gather momentum.
+              </div>
+            )}
           </section>
 
           <section id="explore" className="space-y-6">
@@ -117,57 +121,52 @@ export default async function HomePage() {
             </ButtonLink>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            {spheres.map((sphere) => (
-              <div
-                key={sphere.slug}
-                className="rounded-[32px] border border-white/60 bg-white/70 p-6 shadow-[0_25px_60px_rgba(34,34,59,0.15)]"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">
-                      {sphere.creator}
-                    </p>
-                    <h3 className="text-2xl font-semibold text-[#22223B]">{sphere.title}</h3>
+            {spheres.length ? (
+              spheres.map((sphere) => (
+                <div
+                  key={sphere.slug}
+                  className="rounded-[32px] border border-white/60 bg-white/70 p-6 shadow-[0_25px_60px_rgba(34,34,59,0.15)]"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">{sphere.creator}</p>
+                      <h3 className="text-2xl font-semibold text-[#22223B]">{sphere.title}</h3>
+                    </div>
+                    {sphere.isLive && (
+                      <span className="rounded-full bg-[#e63946]/10 px-3 py-1 text-xs font-bold uppercase text-[#e63946]">
+                        Live • {sphere.liveCount}
+                      </span>
+                    )}
                   </div>
-                  {sphere.isLive && (
-                    <span className="rounded-full bg-[#e63946]/10 px-3 py-1 text-xs font-bold uppercase text-[#e63946]">
-                      Live • {sphere.liveCount}
-                    </span>
-                  )}
-                </div>
-                <p className="mt-3 text-sm text-[#22223B]/80">{sphere.description}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {sphere.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-[#FCE2E5] px-3 py-1 text-xs font-semibold text-[#22223B]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-5 flex flex-wrap gap-6 text-sm text-[#22223B]">
-                  <div>
-                    <p className="text-xl font-bold">{sphere.spectators}</p>
-                    <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/60">
-                      spectators
-                    </p>
+                  <p className="mt-3 text-sm text-[#22223B]/80">{sphere.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {sphere.tags.map((tag) => (
+                      <span key={tag} className="rounded-full bg-[#FCE2E5] px-3 py-1 text-xs font-semibold text-[#22223B]">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                  <div>
-                    <p className="text-xl font-bold">{sphere.recordings}</p>
-                    <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/60">
-                      recordings
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold">{sphere.lastRecordingAt}</p>
-                    <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/60">
-                      last replay
-                    </p>
+                  <div className="mt-5 flex flex-wrap gap-6 text-sm text-[#22223B]">
+                    <div>
+                      <p className="text-xl font-bold">{sphere.spectators}</p>
+                      <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/60">spectators</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold">{sphere.recordings}</p>
+                      <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/60">recordings</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold">{sphere.lastRecordingAt}</p>
+                      <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/60">last replay</p>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="rounded-[32px] border border-dashed border-[#22223B]/20 bg-white/60 p-6 text-sm text-[#22223B]/70 md:col-span-2">
+                No public spheres yet. Use the “Create your sphere” flow to seed the first one and this section will auto-populate.
               </div>
-            ))}
+            )}
           </div>
           </section>
 
@@ -202,18 +201,22 @@ export default async function HomePage() {
             </ButtonLink>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {recordings.map((rec) => (
-              <div key={rec.title} className="rounded-3xl border border-white/50 bg-white/80 p-5">
-                <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">
-                  {rec.sphere}
-                </p>
-                <h3 className="mt-2 text-lg font-semibold text-[#22223B]">{rec.title}</h3>
-                <p className="text-sm text-[#22223B]/70">{rec.length}</p>
-                <ButtonLink href={rec.url} variant="ghost" className="mt-4 px-0">
-                  Watch replay →
-                </ButtonLink>
+            {recordings.length ? (
+              recordings.map((rec) => (
+                <div key={rec.title} className="rounded-3xl border border-white/50 bg-white/80 p-5">
+                  <p className="text-xs uppercase tracking-[0.4em] text-[#22223B]/60">{rec.sphere}</p>
+                  <h3 className="mt-2 text-lg font-semibold text-[#22223B]">{rec.title}</h3>
+                  <p className="text-sm text-[#22223B]/70">{rec.length}</p>
+                  <ButtonLink href={rec.url} variant="ghost" className="mt-4 px-0">
+                    Watch replay →
+                  </ButtonLink>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-3xl border border-dashed border-[#22223B]/20 bg-white/70 p-6 text-center text-sm text-[#22223B]/70 md:col-span-3">
+                Recordings will appear the moment you upload or approve your first replay.
               </div>
-            ))}
+            )}
           </div>
           </section>
 
@@ -242,8 +245,8 @@ export default async function HomePage() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <ButtonLink href={siteLinks.sparkSignup}>Start free (Spark)</ButtonLink>
-            <ButtonLink href={siteLinks.app} variant="secondary">
-              Jump to video app
+            <ButtonLink href={siteLinks.launchSpectator()} variant="secondary">
+              Jump to live room
             </ButtonLink>
           </div>
           </section>

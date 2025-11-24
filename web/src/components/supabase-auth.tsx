@@ -1,8 +1,7 @@
 "use client";
 
 import { Dialog } from "@headlessui/react";
-import { useEffect, useState } from "react";
-import type { Session, SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Button } from "./ui/button";
@@ -11,36 +10,16 @@ type Props = {
   open: boolean;
   onClose: () => void;
   supabase: SupabaseClient | null;
-  setSession: (session: Session | null) => void;
 };
 
-export function SupabaseAuthPortal({ open, onClose, supabase, setSession }: Props) {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!supabase) return;
-    const fetchSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-      setLoading(false);
-    };
-    fetchSession();
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) {
-        onClose();
-      }
-    });
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, [supabase, setSession, onClose]);
-
+export function SupabaseAuthPortal({ open, onClose, supabase }: Props) {
   if (!supabase) return null;
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "") ||
+    "https://chatspheres.com";
+  const redirectTo = `${siteUrl.replace(/\/$/, "")}/auth/callback`;
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-[999]">
@@ -54,26 +33,22 @@ export function SupabaseAuthPortal({ open, onClose, supabase, setSession }: Prop
             Use Supabase auth for both marketing and sphere experiences.
           </p>
           <div className="mt-6">
-            {loading ? (
-              <p className="text-center text-sm text-[#22223B]/70">Loading auth widget…</p>
-            ) : (
-              <Auth
-                supabaseClient={supabase}
-                appearance={{
-                  theme: ThemeSupa,
-                  variables: {
-                    default: {
-                      colors: {
-                        brand: "#E63946",
-                        brandAccent: "#FFD166",
-                      },
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: "#E63946",
+                      brandAccent: "#FFD166",
                     },
                   },
-                }}
-                providers={["github", "google"]}
-                redirectTo={`${process.env.NEXT_PUBLIC_SITE_URL || "https://chatspheres.com"}/auth/callback`}
-              />
-            )}
+                },
+              }}
+              providers={["github", "google"]}
+              redirectTo={redirectTo}
+            />
           </div>
           <Button variant="ghost" className="mt-4 w-full" onClick={onClose}>
             Close

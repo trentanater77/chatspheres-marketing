@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -18,6 +18,34 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAuthOpen, setAuthOpen] = useState(false);
 
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+
+    const syncSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!cancelled) {
+        setSession(session);
+      }
+    };
+
+    syncSession();
+
+    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      if (nextSession) {
+        setAuthOpen(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      data.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
   const value = useMemo(
     () => ({
       supabase,
@@ -31,9 +59,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   return (
     <SupabaseContext.Provider value={value}>
       {children}
-      {supabase && (
-        <AuthPortal open={isAuthOpen} onClose={() => setAuthOpen(false)} supabase={supabase} setSession={setSession} />
-      )}
+      {supabase && <AuthPortal open={isAuthOpen} onClose={() => setAuthOpen(false)} supabase={supabase} />}
     </SupabaseContext.Provider>
   );
 }

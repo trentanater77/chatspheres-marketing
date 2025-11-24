@@ -22,7 +22,7 @@ export default async function ExplorePage() {
             Each sphere is typed into existence by its creator. No templates, no pre-defined topics.
           </p>
         </div>
-        <ButtonLink href={siteLinks.sparkSignup}>Create your sphere</ButtonLink>
+        <ButtonLink href={siteLinks.createSphere}>Create your sphere</ButtonLink>
       </div>
       <ExploreClient initialSpheres={spheres} />
     </PageWithSidebar>

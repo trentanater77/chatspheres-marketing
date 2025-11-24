@@ -19,7 +19,7 @@ export function HeroCtas() {
 
   return (
     <div className="flex flex-wrap gap-4">
-      <ButtonLink href={siteLinks.app}>Launch video chat</ButtonLink>
+      <ButtonLink href={siteLinks.launchHost()}>{`Launch ${siteLinks.defaultSphereSlug}`}</ButtonLink>
       <Button variant="secondary" onClick={handleSparkClick}>
         {session ? "Open your dashboard" : "Start free (Spark)"}
       </Button>

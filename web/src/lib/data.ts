@@ -77,6 +77,7 @@ type ModerationLogRow = {
   spectra?: number | null;
 };
 
+const allowMockData = process.env.NEXT_PUBLIC_ALLOW_MOCKS === "true" || process.env.NODE_ENV !== "production";
 const hasSupabaseEnv =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
   !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
@@ -98,6 +99,13 @@ export const getLandingData = cache(async () => {
 
   if (!supabase) {
     console.warn("Supabase env vars missing or invalid, using mock landing data.");
+    if (!allowMockData) {
+      return {
+        spheres: [],
+        stats: [],
+        recordings: [],
+      };
+    }
     return {
       spheres: featuredSpheres,
       stats: mockStats,
@@ -123,9 +131,9 @@ export const getLandingData = cache(async () => {
           .limit(6),
       ]);
 
-    const fallbackSpheres = featuredSpheres;
-    const fallbackStats = mockStats;
-    const fallbackRecordings = mockRecordings;
+    const fallbackSpheres = allowMockData ? featuredSpheres : [];
+    const fallbackStats = allowMockData ? mockStats : [];
+    const fallbackRecordings = allowMockData ? mockRecordings : [];
 
     return {
       spheres: spheresError ? fallbackSpheres : normalizeSpheres(spheres),
@@ -134,6 +142,13 @@ export const getLandingData = cache(async () => {
     };
   } catch (error) {
     console.warn("Failed to fetch landing data, using mock defaults", error);
+    if (!allowMockData) {
+      return {
+        spheres: [],
+        stats: [],
+        recordings: [],
+      };
+    }
     return {
       spheres: featuredSpheres,
       stats: mockStats,
@@ -145,7 +160,7 @@ export const getLandingData = cache(async () => {
 export const getExploreSpheres = cache(async () => {
   const supabase = getSupabaseClient();
   if (!supabase) {
-    return featuredSpheres;
+    return allowMockData ? featuredSpheres : [];
   }
 
   try {
@@ -159,19 +174,19 @@ export const getExploreSpheres = cache(async () => {
 
     if (error) {
       console.warn("Failed to load spheres, using mock data", error);
-      return featuredSpheres;
+      return allowMockData ? featuredSpheres : [];
     }
     return normalizeSpheres(data);
   } catch (error) {
     console.warn("Failed to load spheres, using mock data", error);
-    return featuredSpheres;
+    return allowMockData ? featuredSpheres : [];
   }
 });
 
 export const getRecordingLibrary = cache(async () => {
   const supabase = getSupabaseClient();
   if (!supabase) {
-    return mockRecordings;
+    return allowMockData ? mockRecordings : [];
   }
 
   try {
@@ -183,12 +198,12 @@ export const getRecordingLibrary = cache(async () => {
 
     if (error) {
       console.warn("Failed to load recordings, using mock data", error);
-      return mockRecordings;
+      return allowMockData ? mockRecordings : [];
     }
     return normalizeRecordings(data);
   } catch (error) {
     console.warn("Failed to load recordings, using mock data", error);
-    return mockRecordings;
+    return allowMockData ? mockRecordings : [];
   }
 });
 
@@ -196,6 +211,9 @@ export const getSphereBySlug = cache(async (slug: string) => {
   const supabase = getSupabaseClient();
   if (!supabase) {
     const fallback = featuredSpheres.find((s) => s.slug === slug);
+    if (!allowMockData) {
+      return { sphere: null, rooms: [] as VideoRoom[] };
+    }
     return { sphere: fallback || null, rooms: [] as VideoRoom[] };
   }
 
@@ -299,7 +317,7 @@ function normalizeSpheres(rows: SphereRow[] | null): LandingSphere[] {
 
 function normalizeRecordings(rows: LandingRecording[] | null) {
   if (!rows?.length) {
-    return mockRecordings;
+    return allowMockData ? mockRecordings : [];
   }
 
   return rows.map((row) => ({

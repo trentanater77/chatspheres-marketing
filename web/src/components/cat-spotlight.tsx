@@ -9,10 +9,12 @@ const DEFAULT_CAT_API = "https://cataas.com/cat/gif?type=smile";
 export function CatSpotlight() {
   const [catUrl, setCatUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const apiUrl = process.env.NEXT_PUBLIC_CAT_API || DEFAULT_CAT_API;
 
   const loadCat = useCallback(() => {
     setLoading(true);
+    setErrorMessage(null);
     const urlWithCacheBust = `${apiUrl}${apiUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
     setCatUrl(urlWithCacheBust);
   }, [apiUrl]);
@@ -41,6 +43,14 @@ export function CatSpotlight() {
                 unoptimized
                 className="object-cover"
                 onLoadingComplete={() => setLoading(false)}
+                onError={() => {
+                  setLoading(false);
+                  setErrorMessage("Cat API is sleepy. Here’s a backup gif.");
+                  const fallbackUrl = `${DEFAULT_CAT_API}${DEFAULT_CAT_API.includes("?") ? "&" : "?"}t=${Date.now()}`;
+                  if (catUrl !== fallbackUrl) {
+                    setCatUrl(fallbackUrl);
+                  }
+                }}
               />
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-[#22223B]/60">
@@ -57,6 +67,7 @@ export function CatSpotlight() {
         <Button variant="secondary" onClick={loadCat}>
           {loading ? "Fetching…" : "New cat please"}
         </Button>
+        {errorMessage && <p className="text-center text-xs text-[#e63946]">{errorMessage}</p>}
       </div>
     </div>
   );

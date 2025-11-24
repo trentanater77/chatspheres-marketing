@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { LandingSphere } from "@/lib/data";
+import { siteLinks } from "@/lib/utils";
 import { ButtonLink } from "./ui/button";
 
 type SidebarSnapshot = {
@@ -164,7 +165,7 @@ export function CommunitySidebar({ initialSphere }: { initialSphere?: LandingSph
         <ButtonLink href={`/spheres/${snapshot.slug}`} variant="secondary">
           View sphere
         </ButtonLink>
-        <ButtonLink href={`https://sphere.chatspheres.com/?mode=spectator&sphere=${snapshot.slug}`} variant="ghost">
+        <ButtonLink href={siteLinks.launchSpectator(snapshot.slug)} variant="ghost">
           Watch live →
         </ButtonLink>
       </div>

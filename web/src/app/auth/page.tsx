@@ -1,23 +1,26 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useSupabase } from "@/components/providers/supabase-provider";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useSearchParams, useRouter } from "next/navigation";
 
 function AuthContent() {
-  const { supabase, session } = useSupabase();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+    const { supabase, session } = useSupabase();
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
   const plan = searchParams.get("plan");
   const next = searchParams.get("next");
+    const error = searchParams.get("error");
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+    const errorMessage = error
+      ? error === "missing-config"
+        ? "Supabase environment variables are missing. Double-check Netlify env vars."
+        : "We couldn’t finish signing you in. Please try again."
+      : null;
+    const isBrowser = typeof window !== "undefined";
 
   useEffect(() => {
     if (session) {
@@ -31,7 +34,7 @@ function AuthContent() {
     }
   }, [session, plan, next, router]);
 
-  if (!mounted) return null;
+    if (!isBrowser) return null;
 
   if (!supabase) {
     return (
@@ -44,7 +47,13 @@ function AuthContent() {
     );
   }
 
-  return (
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (isBrowser ? window.location.origin : "") ||
+        "https://chatspheres.com";
+      const redirectTo = `${siteUrl.replace(/\/$/, "")}/auth/callback`;
+
+      return (
     <div className="flex min-h-screen items-center justify-center bg-[#F4F1DE] p-4">
       <div className="w-full max-w-md rounded-[32px] border border-white/60 bg-white/80 p-8 shadow-[0_20px_60px_rgba(34,34,59,0.1)] backdrop-blur-xl">
         <div className="text-center">
@@ -73,9 +82,10 @@ function AuthContent() {
               },
             }}
             providers={["github", "google"]}
-            redirectTo={`${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`}
+                redirectTo={redirectTo}
             onlyThirdPartyProviders={false}
           />
+              {errorMessage && <p className="mt-4 text-center text-sm text-[#e63946]">{errorMessage}</p>}
         </div>
       </div>
     </div>

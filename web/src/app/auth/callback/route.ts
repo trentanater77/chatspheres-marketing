@@ -9,13 +9,18 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next") || "/spheres";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error("Supabase env vars missing for auth callback");
+    return NextResponse.redirect(new URL(`/auth?error=missing-config&next=${encodeURIComponent(next)}`, request.url));
+  }
 
   if (code) {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
+    try {
+      const cookieStore = await cookies();
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
         cookies: {
           get(name: string) {
             return cookieStore.get(name)?.value;
@@ -27,11 +32,18 @@ export async function GET(request: NextRequest) {
             cookieStore.set({ name, value: "", ...options });
           },
         },
+      });
+
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error("Supabase callback exchange failed", error);
+        return NextResponse.redirect(new URL(`/auth?error=callback&next=${encodeURIComponent(next)}`, request.url));
       }
-    );
-    await supabase.auth.exchangeCodeForSession(code);
+    } catch (error) {
+      console.error("Auth callback blew up", error);
+      return NextResponse.redirect(new URL(`/auth?error=callback&next=${encodeURIComponent(next)}`, request.url));
+    }
   }
 
-  // URL to redirect to after sign in process completes
   return NextResponse.redirect(new URL(next, request.url));
 }

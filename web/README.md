@@ -21,6 +21,8 @@ The site expects a required set of environment variables. Duplicate `env.example
 ```bash
 NEXT_PUBLIC_SITE_URL=https://localhost:3000
 NEXT_PUBLIC_VIDEO_APP_URL=https://sphere.chatspheres.com
+NEXT_PUBLIC_DEFAULT_SPHERE_SLUG=spark-lounge
+NEXT_PUBLIC_ALLOW_MOCKS=true
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
@@ -82,6 +84,7 @@ The following Next.js API routes already replace prior Xano endpoints:
 ### Netlify deployment
 - `netlify.toml` pins `base = "web"` and `publish = ".next"`.
 - Set all environment variables in Netlify UI for both build + runtime contexts (see list above).
+- If you’re on a plan that supports scoped env vars, mark `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, and other long secrets as **Builds only** to stay under AWS Lambda’s 4KB env limit. Otherwise delete unused keys before deploying.
 - Use `npm run build` during deploys.
 
 ### Scripts
