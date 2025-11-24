@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSupabase } from "@/components/providers/supabase-provider";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function AuthPage() {
+function AuthContent() {
   const { supabase, session } = useSupabase();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -21,7 +21,6 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (session) {
-      // If logged in, redirect to where they came from or pricing if plan is set
       if (plan) {
         router.push(`/pricing?plan=${plan}`);
       } else if (next) {
@@ -83,3 +82,19 @@ export default function AuthPage() {
   );
 }
 
+export default function AuthPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#F4F1DE] p-4 text-[#22223B]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Preparing auth form…</h1>
+            <p className="mt-2 text-sm opacity-70">One moment while we load your experience.</p>
+          </div>
+        </div>
+      }
+    >
+      <AuthContent />
+    </Suspense>
+  );
+}
