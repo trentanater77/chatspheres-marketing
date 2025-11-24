@@ -1,17 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSupabase } from "./providers/supabase-provider";
 import { Button } from "./ui/button";
+import { PlanLimitCard } from "./plan-limit-card";
 
 export function CreateSphereForm() {
-  const { session, openAuth } = useSupabase();
+  const { session, openAuth, supabase } = useSupabase();
   const [topicName, setTopicName] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+  const [sphereCount, setSphereCount] = useState(0);
+  const [accountTier, setAccountTier] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!session || !supabase) return;
+    let active = true;
+    const fetchSummary = async () => {
+      const [{ count }, { data }] = await Promise.all([
+        supabase.from("spheres").select("id", { count: "exact", head: true }).eq("user_id", session.user.id),
+        supabase.from("user_stats").select("account_tier").eq("user_id", session.user.id).maybeSingle(),
+      ]);
+      if (!active) return;
+      setSphereCount(count ?? 0);
+      setAccountTier(data?.account_tier || "spark");
+    };
+    fetchSummary();
+    return () => {
+      active = false;
+    };
+  }, [session, supabase]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -53,6 +74,7 @@ export function CreateSphereForm() {
       setCreatedSlug(json.sphere.slug);
       setStatus("success");
       setErrorMessage(null);
+      setSphereCount((prev) => prev + 1);
       setTopicName("");
       setDescription("");
       setTags("");
@@ -65,6 +87,7 @@ export function CreateSphereForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 rounded-[32px] border border-white/60 bg-white/80 p-6 shadow-lg">
+      <PlanLimitCard accountTier={accountTier} spheresUsed={sphereCount} />
       <div>
         <label className="text-xs font-semibold uppercase tracking-[0.4em] text-[#22223B]/60">Topic name</label>
         <input

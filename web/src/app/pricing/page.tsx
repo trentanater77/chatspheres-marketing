@@ -4,6 +4,7 @@ import { getStripeSession } from "@/lib/stripe";
 import { updateUserPlan } from "@/lib/subscription";
 import { getExploreSpheres } from "@/lib/data";
 import { PageWithSidebar } from "@/components/page-with-sidebar";
+import { PlanUsagePanel } from "@/components/plan-usage";
 
 type PricingPageProps = {
   searchParams: Record<string, string | string[] | undefined>;
@@ -50,6 +51,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
         )}
       </div>
       <PricingTable />
+      <PlanUsagePanel />
       <div className="rounded-[32px] border border-white/60 bg-white/80 p-10 text-center shadow-lg">
         <h2 className="text-2xl font-bold text-[#22223B]">Need Enterprise media campaigns?</h2>
         <p className="mt-2 text-sm text-[#22223B]/80">

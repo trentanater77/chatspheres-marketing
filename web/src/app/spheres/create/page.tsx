@@ -2,6 +2,7 @@ import { CreateSphereForm } from "@/components/create-sphere-form";
 import { ButtonLink } from "@/components/ui/button";
 import { getExploreSpheres } from "@/lib/data";
 import { PageWithSidebar } from "@/components/page-with-sidebar";
+import { PlanLimitCard } from "@/components/plan-limit-card";
 
 export const metadata = {
   title: "Create a Sphere — Chatspheres",
@@ -20,6 +21,7 @@ export default async function CreateSpherePage() {
           This writes directly to Supabase, so LiveKit and the marketing site stay in sync without Xano.
         </p>
       </div>
+      <PlanLimitCard accountTier={null} spheresUsed={0} />
       <CreateSphereForm />
       <div className="rounded-[32px] border border-white/60 bg-[#FFF1EB]/70 p-6 text-center shadow-[0_20px_60px_rgba(34,34,59,0.1)]">
         <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">already live?</p>
