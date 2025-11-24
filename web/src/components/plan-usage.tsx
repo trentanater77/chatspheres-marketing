@@ -29,20 +29,18 @@ export function PlanUsagePanel() {
 
     const fetchStats = async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from("user_stats")
-        .select("minutes_remaining, minutes_used_this_month, account_tier")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
+      const [{ data }, { data: profile }] = await Promise.all([
+        supabase
+          .from("user_stats")
+          .select("minutes_remaining, minutes_used_this_month, account_tier, seconds_remaining, seconds_used_this_month")
+          .eq("user_id", session.user.id)
+          .maybeSingle(),
+        supabase.from("profiles").select("stripe_customer_id").eq("user_id", session.user.id).maybeSingle(),
+      ]);
 
       if (!active) return;
       setStats(data);
-
-      const { data: profile } = await supabase.from("profiles").select("stripe_customer_id").eq("user_id", session.user.id).maybeSingle();
-      if (active) {
-        setStripeCustomerId(profile?.stripe_customer_id ?? null);
-      }
-
+      setStripeCustomerId(profile?.stripe_customer_id ?? null);
       setLoading(false);
     };
 

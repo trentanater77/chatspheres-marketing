@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-The site expects a required set of environment variables. Create `web/.env.local` based on the template below.
+The site expects a required set of environment variables. Duplicate `env.example` into `web/.env.local` and fill in real values.
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://localhost:3000
