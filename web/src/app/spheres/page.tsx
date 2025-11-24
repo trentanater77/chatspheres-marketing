@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { getExploreSpheres } from "@/lib/data";
+import { PageWithSidebar } from "@/components/page-with-sidebar";
 
 export const metadata = {
   title: "Communities — Chatspheres",
@@ -8,9 +9,10 @@ export const metadata = {
 
 export default async function SpheresIndexPage() {
   const spheres = await getExploreSpheres();
+  const featuredSphere = spheres[0];
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-16">
+    <PageWithSidebar initialSphere={featuredSphere}>
       <div className="space-y-3">
         <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">communities</p>
         <h1 className="text-4xl font-bold text-[#22223B]">Build your sphere, then spin up rooms.</h1>
@@ -67,7 +69,7 @@ export default async function SpheresIndexPage() {
           Create a sphere
         </ButtonLink>
       </div>
-    </div>
+    </PageWithSidebar>
   );
 }
 

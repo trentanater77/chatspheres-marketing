@@ -11,10 +11,10 @@ import { ShareLinkLab } from "@/components/share-link-lab";
 import { PlanUsagePanel } from "@/components/plan-usage";
 import { CatSpotlight } from "@/components/cat-spotlight";
 import { ModeratorToolkit } from "@/components/moderator-toolkit";
-import { SidebarPreview } from "@/components/sidebar-preview";
 import { ModerationPanelPreview } from "@/components/moderation-panel-preview";
 import { MatchmakingCallout } from "@/components/matchmaking-callout";
 import { LiveStatsTicker } from "@/components/live-stats-ticker";
+import { PageWithSidebar } from "@/components/page-with-sidebar";
 
 export default async function HomePage() {
   const { spheres, stats, recordings } = await getLandingData();
@@ -22,8 +22,9 @@ export default async function HomePage() {
   return (
     <div id="top" className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-16 px-4 py-12">
-        <section className="rounded-[40px] border border-white/60 bg-white/70 p-10 shadow-[0_40px_120px_rgba(34,34,59,0.15)]">
+      <main className="flex-1">
+        <PageWithSidebar initialSphere={spheres[0]} contentClassName="gap-16">
+          <section className="rounded-[40px] border border-white/60 bg-white/70 p-10 shadow-[0_40px_120px_rgba(34,34,59,0.15)]">
           <div className="grid gap-10 md:grid-cols-2">
             <div className="space-y-6">
               <Tag className="bg-[#FFB6B9] text-[#22223B]">Topic-driven video forums</Tag>
@@ -82,11 +83,11 @@ export default async function HomePage() {
               </div>
             </div>
           </div>
-        </section>
+          </section>
 
-        <LiveStatsTicker />
+          <LiveStatsTicker />
 
-        <section className="grid gap-4 sm:grid-cols-3">
+          <section className="grid gap-4 sm:grid-cols-3">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -99,9 +100,9 @@ export default async function HomePage() {
               <p className="text-sm text-[#22223B]/70">{stat.subtext}</p>
             </div>
           ))}
-        </section>
+          </section>
 
-        <section id="explore" className="space-y-6">
+          <section id="explore" className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">
@@ -168,9 +169,9 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+          </section>
 
-        <section className="rounded-[36px] border border-white/60 bg-white/70 p-8 shadow-[0_35px_80px_rgba(34,34,59,0.12)]">
+          <section className="rounded-[36px] border border-white/60 bg-white/70 p-8 shadow-[0_35px_80px_rgba(34,34,59,0.12)]">
           <div className="grid gap-8 md:grid-cols-3">
             {marketingPoints.map((point) => (
               <div key={point.title}>
@@ -179,18 +180,14 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+          </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+          <section className="grid gap-6 md:grid-cols-2">
           <CatSpotlight />
           <ModeratorToolkit />
-        </section>
+          </section>
 
-        <section>
-          <SidebarPreview />
-        </section>
-
-        <section id="recordings" className="space-y-6">
+          <section id="recordings" className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">
@@ -218,23 +215,23 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+          </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+          <section className="grid gap-6 md:grid-cols-2">
           <PlanUsagePanel />
           <ShareLinkLab />
-        </section>
+          </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+          <section className="grid gap-6 md:grid-cols-2">
           <ModerationPanelPreview />
           <MatchmakingCallout />
-        </section>
+          </section>
 
-        <section id="pricing">
+          <section id="pricing">
           <PricingTable />
-        </section>
+          </section>
 
-        <section className="rounded-[36px] border border-white/60 bg-[#FCE2E5]/80 p-10 text-center shadow-[0_25px_80px_rgba(34,34,59,0.15)]">
+          <section className="rounded-[36px] border border-white/60 bg-[#FCE2E5]/80 p-10 text-center shadow-[0_25px_80px_rgba(34,34,59,0.15)]">
           <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">ready?</p>
           <h2 className="mt-4 text-3xl font-bold text-[#22223B]">
             Spin up a sphere, drop in a prompt, invite your people.
@@ -249,7 +246,8 @@ export default async function HomePage() {
               Jump to video app
             </ButtonLink>
           </div>
-        </section>
+          </section>
+        </PageWithSidebar>
       </main>
       <SiteFooter />
     </div>

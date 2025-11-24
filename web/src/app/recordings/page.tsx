@@ -1,21 +1,22 @@
 import { ButtonLink } from "@/components/ui/button";
-import { getRecordingLibrary } from "@/lib/data";
+import { getExploreSpheres, getRecordingLibrary } from "@/lib/data";
+import { PageWithSidebar } from "@/components/page-with-sidebar";
 
 export const metadata = {
   title: "Recordings — Chatspheres",
 };
 
 export default async function RecordingsPage() {
-  const recordingLibrary = await getRecordingLibrary();
+  const [recordingLibrary, spheres] = await Promise.all([getRecordingLibrary(), getExploreSpheres()]);
+  const featuredSphere = spheres[0];
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-4xl flex-col gap-8 px-4 py-16">
+    <PageWithSidebar initialSphere={featuredSphere}>
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">recordings</p>
         <h1 className="mt-3 text-4xl font-bold text-[#22223B]">Community-sourced replays</h1>
         <p className="mt-2 text-sm text-[#22223B]/70">
-          Upload your own sessions or auto-publish from the LiveKit controller. Spark tier includes
-          14-day retention by default.
+          Upload your own sessions or auto-publish from the LiveKit controller. Spark tier includes 14-day retention by default.
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-3">
@@ -30,7 +31,7 @@ export default async function RecordingsPage() {
           </div>
         ))}
       </div>
-    </div>
+    </PageWithSidebar>
   );
 }
 

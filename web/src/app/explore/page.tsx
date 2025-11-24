@@ -2,6 +2,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { getExploreSpheres } from "@/lib/data";
 import { siteLinks } from "@/lib/utils";
 import { ExploreClient } from "@/components/explore-client";
+import { PageWithSidebar } from "@/components/page-with-sidebar";
 
 export const metadata = {
   title: "Explore Spheres — Chatspheres",
@@ -9,9 +10,10 @@ export const metadata = {
 
 export default async function ExplorePage() {
   const spheres = await getExploreSpheres();
+  const featuredSphere = spheres[0];
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-16">
+    <PageWithSidebar initialSphere={featuredSphere}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">explore</p>
@@ -23,7 +25,7 @@ export default async function ExplorePage() {
         <ButtonLink href={siteLinks.sparkSignup}>Create your sphere</ButtonLink>
       </div>
       <ExploreClient initialSpheres={spheres} />
-    </div>
+    </PageWithSidebar>
   );
 }
 

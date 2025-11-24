@@ -1,13 +1,18 @@
 import { CreateSphereForm } from "@/components/create-sphere-form";
 import { ButtonLink } from "@/components/ui/button";
+import { getExploreSpheres } from "@/lib/data";
+import { PageWithSidebar } from "@/components/page-with-sidebar";
 
 export const metadata = {
   title: "Create a Sphere — Chatspheres",
 };
 
-export default function CreateSpherePage() {
+export default async function CreateSpherePage() {
+  const spheres = await getExploreSpheres();
+  const featuredSphere = spheres[0];
+
   return (
-    <div className="mx-auto flex min-h-screen max-w-4xl flex-col gap-8 px-4 py-16">
+    <PageWithSidebar initialSphere={featuredSphere} contentClassName="gap-8">
       <div className="space-y-3 text-center">
         <p className="text-xs uppercase tracking-[0.4em] text-[#e63946] font-bold">create</p>
         <h1 className="text-4xl font-bold text-[#22223B]">Claim your sphere slug.</h1>
@@ -25,7 +30,7 @@ export default function CreateSpherePage() {
           View spheres
         </ButtonLink>
       </div>
-    </div>
+    </PageWithSidebar>
   );
 }
 

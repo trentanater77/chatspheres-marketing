@@ -3,6 +3,7 @@ import { getSphereBySlug } from "@/lib/data";
 import { Tag } from "@/components/ui/tag";
 import { ButtonLink } from "@/components/ui/button";
 import { VideoRoomCard } from "@/components/video-room-card";
+import { PageWithSidebar } from "@/components/page-with-sidebar";
 
 type Props = {
   params: { slug: string };
@@ -26,7 +27,7 @@ export default async function SphereDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-16">
+    <PageWithSidebar initialSphere={sphere}>
       <section className="rounded-[32px] border border-white/60 bg-white/80 p-8 shadow-[0_35px_90px_rgba(34,34,59,0.12)]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -39,25 +40,22 @@ export default async function SphereDetailPage({ params }: Props) {
               ))}
             </div>
           </div>
-          <ButtonLink
-            href={`https://sphere.chatspheres.com/?mode=participant&sphere=${sphere.slug}`}
-            variant="secondary"
-          >
+          <ButtonLink href={`https://sphere.chatspheres.com/?mode=participant&sphere=${sphere.slug}`} variant="secondary">
             Launch in video app
           </ButtonLink>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3 text-sm text-[#22223B]">
+        <div className="mt-6 grid gap-4 text-sm text-[#22223B] sm:grid-cols-3">
           <div>
             <p className="text-3xl font-extrabold text-[#22223B]">{sphere.spectators}</p>
-            <p className="uppercase tracking-[0.3em] text-[#22223B]/60 text-[10px]">spectators</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#22223B]/60">spectators</p>
           </div>
           <div>
             <p className="text-3xl font-extrabold text-[#22223B]">{sphere.recordings}</p>
-            <p className="uppercase tracking-[0.3em] text-[#22223B]/60 text-[10px]">recordings</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#22223B]/60">recordings</p>
           </div>
           <div>
             <p className="text-3xl font-extrabold text-[#22223B]">{sphere.lastRecordingAt}</p>
-            <p className="uppercase tracking-[0.3em] text-[#22223B]/60 text-[10px]">last replay</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#22223B]/60">last replay</p>
           </div>
         </div>
       </section>
@@ -81,7 +79,7 @@ export default async function SphereDetailPage({ params }: Props) {
           </div>
         )}
       </section>
-    </div>
+    </PageWithSidebar>
   );
 }
 
