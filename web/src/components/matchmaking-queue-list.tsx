@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { useSupabase } from "./providers/supabase-provider";
 
@@ -18,7 +18,40 @@ type MatchRequest = {
 export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequest[] }) {
   const [queue, setQueue] = useState(initialQueue);
   const [message, setMessage] = useState<string | null>(null);
-  const { session, openAuth } = useSupabase();
+  const { session, openAuth, supabase } = useSupabase();
+
+  const sortedQueue = useMemo(
+    () => queue.slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+    [queue],
+  );
+
+  useEffect(() => {
+    if (!supabase) return;
+    const channel = supabase
+      .channel("match-requests-feed")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "match_requests" },
+        ({ eventType, new: newRow, old }) => {
+          setQueue((prev) => {
+            if (eventType === "DELETE") {
+              return prev.filter((req) => req.id !== old?.id);
+            }
+            if (!newRow) {
+              return prev;
+            }
+            const updated = prev.some((req) => req.id === newRow.id)
+              ? prev.map((req) => (req.id === newRow.id ? { ...req, ...(newRow as MatchRequest) } : req))
+              : [newRow as MatchRequest, ...prev];
+            return updated.slice(0, 50);
+          });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
 
   const pairRequest = async (requestId: string) => {
     setMessage(null);
@@ -65,8 +98,8 @@ export function MatchmakingQueueList({ initialQueue }: { initialQueue: MatchRequ
         This reads directly from the <code>match_requests</code> table.
       </p>
       <div className="mt-4 space-y-3">
-        {queue.length === 0 && <p className="text-sm text-[#22223B]/60">No active requests.</p>}
-        {queue.map((req) => (
+        {sortedQueue.length === 0 && <p className="text-sm text-[#22223B]/60">No active requests.</p>}
+        {sortedQueue.map((req) => (
           <div key={req.id} className="rounded-2xl border border-[#FFD166]/50 bg-[#FFF1EB]/70 p-4">
             <div className="flex items-center justify-between">
               <div>

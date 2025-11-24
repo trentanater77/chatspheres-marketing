@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { LandingSphere } from "@/lib/data";
 import { ButtonLink } from "./ui/button";
 
@@ -13,23 +13,39 @@ export function ExploreClient({ initialSpheres }: Props) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("live");
   const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const handleSearch = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const fetchSpheres = useCallback(
+    async (overrideQuery = query, overrideSort = sort) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (query) params.set("q", query);
-      params.set("sort", sort);
-      const response = await fetch(`/api/spheres/search?${params.toString()}`);
+      if (overrideQuery) params.set("q", overrideQuery);
+      params.set("sort", overrideSort);
+      const response = await fetch(`/api/spheres/search?${params.toString()}`, { cache: "no-store" });
       const json = await response.json();
       setSpheres(json.spheres || []);
+      setLastUpdated(new Date());
     } catch (error) {
       console.warn("Search failed", error);
     } finally {
       setLoading(false);
     }
+    },
+    [query, sort],
+  );
+
+  const handleSearch = async (event: React.FormEvent) => {
+    event.preventDefault();
+    fetchSpheres();
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchSpheres();
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [fetchSpheres]);
 
   return (
     <div className="space-y-4">
@@ -54,10 +70,16 @@ export function ExploreClient({ initialSpheres }: Props) {
             type="submit"
             className="rounded-full bg-[#FFD166] px-5 py-2 text-sm font-bold text-[#22223B] transition hover:bg-[#e63946] hover:text-white"
           >
-            {loading ? "Searching…" : "Search"}
+            {loading ? "Refreshing…" : "Search"}
           </button>
         </div>
       </form>
+
+      {lastUpdated && (
+        <p className="text-xs uppercase tracking-[0.3em] text-[#22223B]/50">
+          Auto-refresh • Last updated {lastUpdated.toLocaleTimeString()}
+        </p>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         {spheres.map((sphere) => (
