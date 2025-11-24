@@ -45,10 +45,11 @@ export function CreateSphereForm() {
           userId: session.user.id,
         }),
       });
+      const payload = await response.json();
       if (!response.ok) {
-        throw new Error(await response.text());
+        throw new Error(payload.error || "Unable to create sphere right now. Please try again.");
       }
-      const json = await response.json();
+      const json = payload;
       setCreatedSlug(json.sphere.slug);
       setStatus("success");
       setErrorMessage(null);
@@ -58,7 +59,7 @@ export function CreateSphereForm() {
     } catch (error) {
       console.error(error);
       setStatus("error");
-      setErrorMessage("Unable to create sphere right now. Please try again.");
+      setErrorMessage(error instanceof Error ? error.message : "Unable to create sphere right now. Please try again.");
     }
   };
 

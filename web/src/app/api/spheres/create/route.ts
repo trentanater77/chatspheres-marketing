@@ -4,6 +4,13 @@ import { nanoid } from "nanoid";
 
 export const runtime = "nodejs";
 
+const PLAN_LIMITS: Record<string, number | null> = {
+  spark: 5,
+  "spark+": 10,
+  orbit: 25,
+  constellation: null,
+};
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseServiceRoleClient();
@@ -12,6 +19,30 @@ export async function POST(request: NextRequest) {
 
     if (!topicName || !userId) {
       return NextResponse.json({ error: "topicName and userId are required" }, { status: 400 });
+    }
+
+    const { data: statsRow } = await supabase
+      .from("user_stats")
+      .select("account_tier")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const tier = (statsRow?.account_tier || "spark").toLowerCase();
+    const maxSpheres = PLAN_LIMITS[tier] ?? PLAN_LIMITS.spark;
+
+    if (maxSpheres !== null) {
+      const { count } = await supabase
+        .from("spheres")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+      if ((count ?? 0) >= maxSpheres) {
+        return NextResponse.json(
+          {
+            error: `Your ${tier.toUpperCase()} plan allows up to ${maxSpheres} spheres. Upgrade in the Plan Usage panel for more headroom.`,
+            code: "sphere_limit_reached",
+          },
+          { status: 403 },
+        );
+      }
     }
 
     const slugBase = topicName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

@@ -59,6 +59,9 @@ SUPABASE_SERVICE_ROLE_KEY should NEVER be exposed to the browser (Next.js server
 4. Hitting `/api/billing/portal` (wired via “Manage billing” in Plan Usage) opens the Stripe Customer Portal if a `stripe_customer_id` exists.
 5. When testing, run `npm run dev`, open `/pricing`, and trigger the upgrade buttons. Successful checkouts redirect back with `session_id`, and the server updates `user_stats.account_tier`.
 
+### Plan enforcement
+- `/api/spheres/create` enforces sphere caps per plan (`Spark = 5`, `Spark+ = 10`, `Orbit = 25`, `Constellation = unlimited`). Populate `user_stats.account_tier` for each user so the API can gate sphere creation correctly.
+
 ### LiveKit controller hand-off
 `/api/matchmaking/livekit` forwards matched participants to a control webhook. Provide:
 - `LIVEKIT_CONTROL_URL`: HTTPS endpoint exposed by the controller (e.g., wrapper/server controller)
