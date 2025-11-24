@@ -42,6 +42,12 @@ create policy "Authenticated users view matchmaking queue" on public.match_reque
   for select
   using (auth.role() = 'authenticated' or auth.role() = 'service_role');
 
+drop policy if exists "Admin moderation updates" on public.match_requests;
+create policy "Admin moderation updates" on public.match_requests
+  for update
+  using (auth.role() = 'service_role')
+  with check (auth.role() = 'service_role');
+
 drop policy if exists "Moderation service logs actions" on public.moderation_logs;
 create policy "Moderation service logs actions" on public.moderation_logs
   for insert
