@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -19,7 +20,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing priceId parameter" }, { status: 400 });
   }
 
+  const supabase = getSupabaseServiceRoleClient();
+
+  const getOrCreateCustomer = async () => {
+    if (!userId || !supabase) return null;
+    const { data } = await supabase.from("profiles").select("stripe_customer_id").eq("user_id", userId).maybeSingle();
+    let customerId = data?.stripe_customer_id ?? null;
+
+    if (!customerId) {
+      const customer = await stripe!.customers.create({
+        email: customerEmail || undefined,
+        metadata: { userId },
+      });
+      customerId = customer.id;
+      await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("user_id", userId);
+    }
+    return customerId;
+  };
+
   try {
+    const customerId = await getOrCreateCustomer();
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [
@@ -29,7 +50,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       allow_promotion_codes: true,
-      customer_email: customerEmail || undefined,
+      customer: customerId || undefined,
+      customer_email: customerId ? undefined : customerEmail || undefined,
       success_url: `${siteUrl}/pricing?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/pricing?status=cancelled`,
       metadata: {

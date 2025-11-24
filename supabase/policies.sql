@@ -7,6 +7,8 @@ alter table if exists public.video_rooms enable row level security;
 alter table if exists public.match_requests enable row level security;
 alter table if exists public.moderation_logs enable row level security;
 
+alter table if exists public.profiles add column if not exists stripe_customer_id text;
+
 -- Ensure matchmaking table carries referencing info used across the app.
 alter table if exists public.match_requests add column if not exists sphere_slug text;
 alter table if exists public.match_requests add column if not exists room_slug text;

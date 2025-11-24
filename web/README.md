@@ -41,7 +41,7 @@ SUPABASE_SERVICE_ROLE_KEY should NEVER be exposed to the browser (Next.js server
 ### Required Supabase setup
 1. Run `supabase/policies.sql` inside the Supabase SQL editor. It:
    - Enables RLS on `user_stats`, `profiles`, `forum_members`, `video_rooms`, `match_requests`, and `moderation_logs`.
-   - Adds `sphere_slug` + `room_slug` columns to `match_requests`.
+   - Adds `stripe_customer_id` to `profiles` and `sphere_slug` + `room_slug` to `match_requests`.
    - Creates policies so authenticated users can submit matchmaking requests, moderators can read the queue/logs, and the service role can log actions.
 2. Ensure the following tables/views exist (matching the LiveKit wrapper expectations):
    - `spheres`, `spheres_public_view`
@@ -55,8 +55,9 @@ SUPABASE_SERVICE_ROLE_KEY should NEVER be exposed to the browser (Next.js server
 ### Stripe checklist
 1. Create products/prices for Spark+, Orbit, Constellation (monthly + yearly).
 2. Set the `NEXT_PUBLIC_STRIPE_*_PRICE` env vars to the corresponding price IDs.
-3. Configure `STRIPE_SECRET_KEY` (test or live) and optional Customer Portal domain (future enhancement).
-4. When testing, run `npm run dev`, open `/pricing`, and trigger the upgrade buttons. Successful checkouts redirect back with `session_id`, and the server updates `user_stats.account_tier`.
+3. Configure `STRIPE_SECRET_KEY` (test or live). The app now auto-creates Stripe customers per Supabase profile and saves the ID in `profiles.stripe_customer_id`.
+4. Hitting `/api/billing/portal` (wired via “Manage billing” in Plan Usage) opens the Stripe Customer Portal if a `stripe_customer_id` exists.
+5. When testing, run `npm run dev`, open `/pricing`, and trigger the upgrade buttons. Successful checkouts redirect back with `session_id`, and the server updates `user_stats.account_tier`.
 
 ### LiveKit controller hand-off
 `/api/matchmaking/livekit` forwards matched participants to a control webhook. Provide:

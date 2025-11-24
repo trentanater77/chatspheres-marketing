@@ -16,6 +16,8 @@ export function PlanUsagePanel() {
   const { supabase, session, openAuth } = useSupabase();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const loggedIn = Boolean(session);
 
   useEffect(() => {
@@ -35,6 +37,12 @@ export function PlanUsagePanel() {
 
       if (!active) return;
       setStats(data);
+
+      const { data: profile } = await supabase.from("profiles").select("stripe_customer_id").eq("user_id", session.user.id).maybeSingle();
+      if (active) {
+        setStripeCustomerId(profile?.stripe_customer_id ?? null);
+      }
+
       setLoading(false);
     };
 
@@ -68,6 +76,30 @@ export function PlanUsagePanel() {
     return null;
   }, [currentTier]);
 
+  const handleManageBilling = async () => {
+    if (!session) {
+      openAuth();
+      return;
+    }
+    setPortalLoading(true);
+    try {
+      const response = await fetch("/api/billing/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.id }),
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error(error);
+      alert("Unable to open billing portal right now.");
+      setPortalLoading(false);
+    }
+  };
+
   if (!loggedIn) {
     return (
       <div className="rounded-[32px] border border-white/60 bg-white/80 p-6 shadow-[0_20px_60px_rgba(34,34,59,0.1)]">
@@ -99,6 +131,13 @@ export function PlanUsagePanel() {
               />
             )}
           </div>
+          {stripeCustomerId && (
+            <div className="mt-2">
+              <Button variant="ghost" disabled={portalLoading} onClick={handleManageBilling}>
+                {portalLoading ? "Opening portal..." : "Manage billing"}
+              </Button>
+            </div>
+          )}
           <div className="mt-3 rounded-2xl bg-[#FCE2E5]/60 p-4">
             <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.3em] text-[#22223B]/70">
               <span>usage this month</span>
