@@ -85,7 +85,7 @@ export function SiteHeader() {
             mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0 pointer-events-none",
           )}
         >
-          <div className="flex flex-col gap-4 text-sm font-semibold text-[#22223B]">
+          <div className="flex flex-col gap-6 text-lg font-medium text-[#22223B]">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -101,13 +101,6 @@ export function SiteHeader() {
             <Button variant="secondary" onClick={handleAuthClick}>
               {session ? "Dashboard" : "Sign in"}
             </Button>
-            <Link
-              href={siteLinks.app}
-              className="rounded-full bg-[#FFD166] px-5 py-2 text-center text-sm font-bold text-[#22223B] transition hover:bg-[#e63946] hover:text-white shadow-[0_15px_30px_rgba(230,57,70,0.15)]"
-              onClick={() => setMobileOpen(false)}
-            >
-              Launch video chat
-            </Link>
           </div>
         </nav>
 
@@ -123,12 +116,6 @@ export function SiteHeader() {
           <Button variant="secondary" onClick={handleAuthClick} className="hidden md:inline-flex">
             {session ? "Dashboard" : "Sign in"}
           </Button>
-          <Link
-            href={siteLinks.app}
-            className="rounded-full bg-[#FFD166] px-5 py-2 text-sm font-bold text-[#22223B] transition hover:bg-[#e63946] hover:text-white shadow-[0_15px_30px_rgba(230,57,70,0.15)]"
-          >
-            Launch video chat
-          </Link>
         </div>
       </div>
     </header>

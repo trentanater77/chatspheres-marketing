@@ -52,7 +52,7 @@ export function PricingTable() {
           return (
             <div
               key={plan.name}
-              className="flex flex-col rounded-3xl border border-[#22223B]/10 bg-white/80 p-5"
+              className="flex h-full flex-col rounded-3xl border border-[#22223B]/10 bg-white/80 p-5"
             >
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#22223B]/70">
@@ -79,7 +79,7 @@ export function PricingTable() {
               </p>
               <p className="mt-2 text-sm text-[#22223B]/80">{plan.description}</p>
 
-              <ul className="mt-4 space-y-2 text-sm text-[#22223B]">
+              <ul className="mt-4 flex-1 space-y-2 text-sm text-[#22223B]">
                 {plan.limits.map((limit) => (
                   <li key={limit} className="flex gap-2">
                     <span className="text-[#e63946]">•</span>

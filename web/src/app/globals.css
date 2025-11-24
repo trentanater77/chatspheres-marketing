@@ -55,3 +55,20 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
 }
+
+@media (max-width: 768px) {
+  .stats-grid,
+  .section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .section-grid-single,
+  .stats-grid-single {
+    grid-template-columns: 1fr;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+}

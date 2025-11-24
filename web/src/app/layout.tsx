@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Nunito, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
 
@@ -39,7 +38,6 @@ export default function RootLayout({
               <div className="absolute -bottom-32 left-10 h-[520px] w-[520px] rounded-full bg-[#FFD166] blur-3xl opacity-30" />
             </div>
             {children}
-            <Analytics />
           </div>
         </SupabaseProvider>
       </body>

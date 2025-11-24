@@ -84,3 +84,5 @@ export function SupabaseAuthPortal({ open, onClose, supabase, setSession }: Prop
   );
 }
 
+
+

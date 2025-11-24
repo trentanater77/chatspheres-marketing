@@ -278,7 +278,7 @@ export const getModerationLogs = cache(async (limit = 20) => {
 
 function normalizeSpheres(rows: SphereRow[] | null): LandingSphere[] {
   if (!rows?.length) {
-    return featuredSpheres;
+    return [];
   }
 
   return rows.map((row) => ({
