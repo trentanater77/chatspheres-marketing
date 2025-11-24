@@ -60,6 +60,7 @@ function apiRowToSnapshot(row?: SidebarApiSphere | null): SidebarSnapshot | null
 export function CommunitySidebar({ initialSphere }: { initialSphere?: LandingSphere | null }) {
   const [snapshot, setSnapshot] = useState<SidebarSnapshot>(() => landingToSnapshot(initialSphere));
   const [lastUpdated, setLastUpdated] = useState<string>("Just now");
+  const targetSlug = initialSphere?.slug || null;
 
   useEffect(() => {
     setSnapshot(landingToSnapshot(initialSphere));
@@ -69,7 +70,13 @@ export function CommunitySidebar({ initialSphere }: { initialSphere?: LandingSph
     let cancelled = false;
     async function refreshSidebar() {
       try {
-        const response = await fetch("/api/spheres/search?sort=live&limit=1", { cache: "no-store" });
+        const params = new URLSearchParams({ limit: "1" });
+        if (targetSlug) {
+          params.set("slug", targetSlug);
+        } else {
+          params.set("sort", "live");
+        }
+        const response = await fetch(`/api/spheres/search?${params.toString()}`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(await response.text());
         }
@@ -89,7 +96,7 @@ export function CommunitySidebar({ initialSphere }: { initialSphere?: LandingSph
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, [targetSlug]);
 
   const isLive = snapshot.liveCount >= 2;
   const liveLabel = isLive ? `Live • ${snapshot.liveCount} hosts` : snapshot.liveCount === 1 ? "1 host warming up" : "Offline";
